@@ -566,11 +566,17 @@
             height: 8px;
             border-radius: 50%;
             background: #22c55e;
+            transition: background 0.3s;
         }
         
         .data-status-dot.loading {
             background: #f59e0b;
             animation: pulse 1s infinite;
+        }
+        
+        .data-status-dot.has-changes {
+            background: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
         }
         
         @keyframes pulse {
@@ -646,7 +652,7 @@
             display: flex;
             align-items: flex-start;
             gap: 0.5rem;
-            padding: 0.4rem 0;
+            padding: 0.5rem 0;
             border-bottom: 1px solid #f0eeea;
         }
         
@@ -655,15 +661,16 @@
         }
         
         .changelog-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
+            width: 22px;
+            height: 22px;
+            border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             color: #fff;
             flex-shrink: 0;
+            margin-top: 2px;
         }
         
         .changelog-info {
@@ -672,14 +679,39 @@
         }
         
         .changelog-name {
-            font-weight: 500;
-            color: var(--text-primary);
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.75rem;
+            margin-bottom: 2px;
         }
         
         .changelog-detail {
             color: var(--text-muted);
-            font-size: 0.65rem;
-            line-height: 1.3;
+            font-size: 0.68rem;
+            line-height: 1.4;
+        }
+        
+        .changelog-detail strong {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        
+        .changelog-summary {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+            color: #166534;
+            font-weight: 500;
+        }
+        
+        .changelog-summary.has-changes {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+            color: #92400e;
         }
         
         .data-admin-row {
@@ -3065,7 +3097,7 @@
             return changed.slice(0, 3); // Max 3 fields to show
         }
         
-        // Compare settings object
+        // Compare settings object with detailed value tracking
         function compareSettings(oldSettings, newSettings, lang) {
             const changes = {
                 added: [],
@@ -3074,8 +3106,48 @@
                 unchanged: 0
             };
             
+            // Friendly names for settings keys (TR/EN)
+            const settingLabels = {
+                site_name: { en: 'Site Name', tr: 'Site Adı' },
+                hero_title_en: { en: 'Hero Title (EN)', tr: 'Ana Başlık (EN)' },
+                hero_title_tr: { en: 'Hero Title (TR)', tr: 'Ana Başlık (TR)' },
+                hero_subtitle_en: { en: 'Hero Subtitle (EN)', tr: 'Alt Başlık (EN)' },
+                hero_subtitle_tr: { en: 'Hero Subtitle (TR)', tr: 'Alt Başlık (TR)' },
+                stat_faculty: { en: 'Faculty Count', tr: 'Akademisyen Sayısı' },
+                stat_students: { en: 'Student Count', tr: 'Öğrenci Sayısı' },
+                stat_publications: { en: 'Publications', tr: 'Yayın Sayısı' },
+                stat_grants: { en: 'Grants', tr: 'Hibe Miktarı' },
+                stat_employment: { en: 'Employment Rate', tr: 'İstihdam Oranı' },
+                stat_partners: { en: 'Partner Count', tr: 'Ortak Sayısı' },
+                phone: { en: 'Phone', tr: 'Telefon' },
+                email: { en: 'Email', tr: 'E-posta' },
+                hours: { en: 'Office Hours', tr: 'Çalışma Saatleri' },
+                chair: { en: 'Department Chair', tr: 'Bölüm Başkanı' },
+                grad_coordinator: { en: 'Graduate Coordinator', tr: 'Lisansüstü Koordinatörü' },
+                mission_en: { en: 'Mission (EN)', tr: 'Misyon (EN)' },
+                mission_tr: { en: 'Mission (TR)', tr: 'Misyon (TR)' },
+                vision_en: { en: 'Vision (EN)', tr: 'Vizyon (EN)' },
+                vision_tr: { en: 'Vision (TR)', tr: 'Vizyon (TR)' },
+                about_subtitle_en: { en: 'About Subtitle (EN)', tr: 'Hakkında Alt Başlık (EN)' },
+                about_subtitle_tr: { en: 'About Subtitle (TR)', tr: 'Hakkında Alt Başlık (TR)' },
+                accreditation_en: { en: 'Accreditation (EN)', tr: 'Akreditasyon (EN)' },
+                accreditation_tr: { en: 'Accreditation (TR)', tr: 'Akreditasyon (TR)' },
+                accreditation_status: { en: 'Accreditation Status', tr: 'Akreditasyon Durumu' },
+                alumni_total: { en: 'Total Alumni', tr: 'Toplam Mezun' },
+                alumni_employed: { en: 'Alumni Employed', tr: 'İstihdam Edilen Mezun' },
+                alumni_startups: { en: 'Alumni Startups', tr: 'Mezun Girişimleri' }
+            };
+            
+            const getLabel = (key) => {
+                const label = settingLabels[key];
+                if (label) {
+                    return lang === 'tr' ? label.tr : label.en;
+                }
+                return key;
+            };
+            
             if (!oldSettings || Object.keys(oldSettings).length === 0) {
-                changes.added = Object.keys(newSettings || {});
+                changes.added = Object.keys(newSettings || {}).map(k => getLabel(k));
                 return changes;
             }
             
@@ -3084,9 +3156,16 @@
             
             newKeys.forEach(key => {
                 if (!(key in oldSettings)) {
-                    changes.added.push(key);
+                    changes.added.push(getLabel(key));
                 } else if (oldSettings[key] !== newSettings[key]) {
-                    changes.modified.push({ title: key, fields: ['değer'] });
+                    // Store detailed change info with old and new values
+                    changes.modified.push({ 
+                        title: getLabel(key), 
+                        fields: [],
+                        oldValue: oldSettings[key],
+                        newValue: newSettings[key],
+                        key: key
+                    });
                 } else {
                     changes.unchanged++;
                 }
@@ -3094,14 +3173,14 @@
             
             oldKeys.forEach(key => {
                 if (!(key in newSettings)) {
-                    changes.removed.push(key);
+                    changes.removed.push(getLabel(key));
                 }
             });
             
             return changes;
         }
         
-        // Generate smart change message
+        // Generate smart change message with value details
         function generateChangeMessage(changes, sheetName, lang) {
             const parts = [];
             const isTr = lang === 'tr';
@@ -3120,9 +3199,25 @@
             }
             
             if (changes.modified.length > 0) {
-                if (changes.modified.length <= 2) {
+                // Check if this is a settings change with value tracking
+                const hasValueTracking = changes.modified.some(m => m.oldValue !== undefined);
+                
+                if (hasValueTracking) {
+                    // Show detailed value changes for settings
+                    const details = changes.modified.slice(0, 3).map(m => {
+                        const oldVal = truncateValue(m.oldValue);
+                        const newVal = truncateValue(m.newValue);
+                        return `<strong>${m.title}</strong>: ${oldVal} → ${newVal}`;
+                    }).join('<br>');
+                    parts.push(isTr 
+                        ? `<span style="color:#f59e0b;">✏️ ${changes.modified.length} güncellendi:</span><br>${details}`
+                        : `<span style="color:#f59e0b;">✏️ ${changes.modified.length} updated:</span><br>${details}`);
+                    if (changes.modified.length > 3) {
+                        parts.push(isTr ? `<em>...ve ${changes.modified.length - 3} daha</em>` : `<em>...and ${changes.modified.length - 3} more</em>`);
+                    }
+                } else if (changes.modified.length <= 2) {
                     const details = changes.modified.map(m => {
-                        const fieldStr = m.fields.length > 0 ? ` (${m.fields.join(', ')})` : '';
+                        const fieldStr = m.fields && m.fields.length > 0 ? ` (${m.fields.join(', ')})` : '';
                         return `"${m.title}"${fieldStr}`;
                     }).join(', ');
                     parts.push(isTr 
@@ -3156,6 +3251,16 @@
             }
             
             return parts.join('<br>');
+        }
+        
+        // Truncate long values for display
+        function truncateValue(val) {
+            if (val === undefined || val === null) return '—';
+            const str = String(val);
+            if (str.length > 20) {
+                return str.substring(0, 17) + '...';
+            }
+            return str;
         }
         
         // Get change type for styling
@@ -3205,11 +3310,41 @@
             const changed = UPDATE_LOG.filter(item => item.changeType !== 'unchanged');
             
             if (changed.length === 0) {
-                container.innerHTML = `<span class="text-muted">${lang === 'tr' ? 'Değişiklik yok' : 'No changes'}</span>`;
+                container.innerHTML = `
+                    <div class="changelog-summary">
+                        <i class="fa-solid fa-check-circle"></i>
+                        ${lang === 'tr' ? 'Tüm veriler güncel' : 'All data up to date'}
+                    </div>
+                    <span class="text-muted">${lang === 'tr' ? 'Son yenilemede değişiklik tespit edilmedi.' : 'No changes detected in last refresh.'}</span>
+                `;
                 return;
             }
             
-            const html = changed.slice(0, 8).map(item => {
+            // Count total changes
+            let totalAdded = 0, totalModified = 0, totalRemoved = 0;
+            changed.forEach(item => {
+                if (item.changes) {
+                    totalAdded += item.changes.added?.length || 0;
+                    totalModified += item.changes.modified?.length || 0;
+                    totalRemoved += item.changes.removed?.length || 0;
+                }
+            });
+            
+            // Build summary
+            const summaryParts = [];
+            if (totalAdded > 0) summaryParts.push(`+${totalAdded}`);
+            if (totalModified > 0) summaryParts.push(`✏️${totalModified}`);
+            if (totalRemoved > 0) summaryParts.push(`-${totalRemoved}`);
+            
+            let html = `
+                <div class="changelog-summary has-changes">
+                    <i class="fa-solid fa-sync-alt"></i>
+                    ${lang === 'tr' ? `${changed.length} sekmede değişiklik` : `Changes in ${changed.length} tab(s)`}
+                    ${summaryParts.length > 0 ? `(${summaryParts.join(', ')})` : ''}
+                </div>
+            `;
+            
+            html += changed.slice(0, 8).map(item => {
                 const cfg = icons[item.name] || { icon: 'fa-database', color: '#64748b' };
                 const displayName = lang === 'tr' ? (SHEET_NAMES_TR[item.name] || item.name) : item.name;
                 
@@ -3227,6 +3362,12 @@
             }).join('');
             
             container.innerHTML = html;
+            
+            // Auto-expand the log panel when there are changes
+            const logPanel = document.getElementById('sidebarChangeLog');
+            if (logPanel && changed.length > 0) {
+                logPanel.style.display = 'block';
+            }
         }
         
         // Update sidebar last updated time
@@ -4380,13 +4521,32 @@
                     btn.disabled = true;
                     btn.innerHTML = `<i class="fa-solid fa-spinner" style="animation: spin 1s linear infinite;"></i> <span data-en>...</span><span data-tr>...</span>`;
                 }
-                if (dot) dot.classList.add('loading');
+                if (dot) {
+                    dot.classList.add('loading');
+                    dot.classList.remove('has-changes');
+                }
             } else {
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = `<i class="fa-solid fa-rotate"></i> <span data-en>Refresh</span><span data-tr>Yenile</span>`;
                 }
-                if (dot) dot.classList.remove('loading');
+                if (dot) {
+                    dot.classList.remove('loading');
+                }
+            }
+        }
+        
+        // Update status dot to reflect whether there were changes
+        function updateChangeStatusIndicator() {
+            const dot = document.getElementById('dataStatusDot');
+            if (!dot) return;
+            
+            const hasChanges = UPDATE_LOG.some(item => item.changeType !== 'unchanged');
+            
+            if (hasChanges) {
+                dot.classList.add('has-changes');
+            } else {
+                dot.classList.remove('has-changes');
             }
         }
 
@@ -4502,7 +4662,11 @@
             }
             
             renderUpdateLog();
+            renderSidebarLog();
             renderAll();
+            
+            // Update the status indicator to show if there were changes
+            updateChangeStatusIndicator();
 
             // store last updated timestamp
             localStorage.setItem('lastUpdatedTs', String(Date.now()));
