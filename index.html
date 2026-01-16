@@ -2367,7 +2367,7 @@
                     <div class="section-header">
                         <h2><span data-en>Featured Research</span><span data-tr>Öne Çıkan Araştırma</span></h2>
                         <button class="btn btn-ghost btn-sm" onclick="goTo('research')"><span data-en>View
-                                All</span><span data-tr>Tümü</span> â†’</button>
+                                All</span><span data-tr>Tümü</span> →</button>
                     </div>
                     <div class="card-grid" id="featuredResearch">
                         <div class="card skeleton" style="height:260px;"></div>
@@ -2380,7 +2380,7 @@
                     <div class="section-header">
                         <h2><span data-en>Student Projects</span><span data-tr>Öğrenci Projeleri</span></h2>
                         <button class="btn btn-ghost btn-sm" onclick="goTo('projects')"><span data-en>All
-                                Projects</span><span data-tr>Tüm Projeler</span> â†’</button>
+                                Projects</span><span data-tr>Tüm Projeler</span> →</button>
                     </div>
                     <div class="card-grid card-grid-sm" id="featuredProjects">
                         <div class="project-card skeleton" style="height:220px;"></div>
@@ -2394,7 +2394,7 @@
                     <div class="section-header">
                         <h2><span data-en>Latest News</span><span data-tr>Son Haberler</span></h2>
                         <button class="btn btn-ghost btn-sm" onclick="goTo('news')"><span data-en>All News</span><span
-                                data-tr>Tüm Haberler</span> â†’</button>
+                                data-tr>Tüm Haberler</span> →</button>
                     </div>
                     <div class="card-grid" id="latestNews">
                         <div class="news-card skeleton" style="height:220px;"></div>
@@ -3207,7 +3207,7 @@
                     const details = changes.modified.slice(0, 3).map(m => {
                         const oldVal = truncateValue(m.oldValue);
                         const newVal = truncateValue(m.newValue);
-                        return `<strong>${m.title}</strong>: ${oldVal} â†’ ${newVal}`;
+                        return `<strong>${m.title}</strong>: ${oldVal} → ${newVal}`;
                     }).join('<br>');
                     parts.push(isTr 
                         ? `<span style="color:#f59e0b;">âœï¸ ${changes.modified.length} güncellendi:</span><br>${details}`
@@ -3696,7 +3696,7 @@
 
             const eventsHTML = events.map((e, i) => `
             <div class="timeline-item card-clickable" onclick="goToEventDetail(${i})" style="cursor:pointer;">
-                <div class="timeline-date">${e.date} Â· ${e.time}</div>
+                <div class="timeline-date">${e.date} · ${e.time}</div>
                 <div class="timeline-card">
                     <span class="tag ${getTagClass(e.type)}">${e.type || 'Event'}</span>
                     <h4>${t(e.title_en, e.title_tr)}</h4>
@@ -3729,7 +3729,7 @@
                     <h3>${t(r.name_en, r.name_tr)}</h3>
                     <p>${t(r.description_en, r.description_tr)}</p>
                 </div>
-                <div class="card-footer"><span>${r.lead}</span><span class="card-footer-link">${t('Learn more', 'Detaylar')} â†’</span></div>
+                <div class="card-footer"><span>${r.lead}</span><span class="card-footer-link">${t('Learn more', 'Detaylar')} →</span></div>
             </div>
         `).join('');
             document.getElementById('featuredResearch').innerHTML = featuredHTML || `<p>${t('No research groups.', 'Araştırma grubu yok.')}</p>`;
@@ -3860,7 +3860,7 @@
                     </div>
                     <div class="course-info">
                         <h4>${c.code}: ${t(c.name_en, c.name_tr)}</h4>
-                        <p>${t(c.description_en, c.description_tr)} Â· ${c.instructor} Â· ${c.year}</p>
+                        <p>${t(c.description_en, c.description_tr)} · ${c.instructor} · ${c.year}</p>
                     </div>
                     <span class="tag">${c.ects || '3'} ECTS</span>
                 </div>
@@ -3914,8 +3914,8 @@
                     <p>${t(l.equipment_en, l.equipment_tr)}</p>
                 </div>
                 <div class="card-footer">
-                    <span>${l.room} Â· ${l.manager}</span>
-                    <span class="card-footer-link">${t('View Details', 'Detaylar')} â†’</span>
+                    <span>${l.room} · ${l.manager}</span>
+                    <span class="card-footer-link">${t('View Details', 'Detaylar')} →</span>
                 </div>
             </div>
         `).join('');
@@ -3929,7 +3929,7 @@
             <div class="card-compact card-clickable" onclick="goToJobDetail(${i})" style="cursor:pointer;">
                 <div class="card-compact-content">
                     <h4>${t(j.title_en, j.title_tr)}</h4>
-                    <p>${j.company} Â· ${j.location} Â· ${j.salary}</p>
+                    <p>${j.company} · ${j.location} · ${j.salary}</p>
                 </div>
                 <span class="tag ${getTagClass(j.type)}">${j.type || 'Job'}</span>
             </div>
@@ -5127,7 +5127,7 @@
     â•‘     - Courses, Projects, Labs, Jobs, Alumni, Partners, Students               â•‘
     â•‘                                                                                â•‘
     â•‘  2. PUBLISH THE SHEET:                                                         â•‘
-    â•‘     File â†’ Share â†’ Publish to web â†’ Entire Document â†’ CSV â†’ Publish           â•‘
+    â•‘     File → Share → Publish to web → Entire Document → CSV → Publish           â•‘
     â•‘                                                                                â•‘
     â•‘  3. COPY THE SHEET ID from the URL:                                            â•‘
     â•‘     https://docs.google.com/spreadsheets/d/[THIS_IS_THE_ID]/edit              â•‘
