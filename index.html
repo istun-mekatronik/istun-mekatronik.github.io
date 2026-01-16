@@ -3561,10 +3561,10 @@
                         inQuotes = !inQuotes;
                     }
                 } else if (char === ',' && !inQuotes) {
-                    currentRow.push(currentVal.trim());
+                    currentRow.push(currentVal);
                     currentVal = '';
                 } else if (char === '\n' && !inQuotes) {
-                    currentRow.push(currentVal.trim());
+                    currentRow.push(currentVal);
                     if (currentRow.length > 0 && (currentRow.length > 1 || currentRow[0] !== '')) {
                         rows.push(currentRow);
                     }
@@ -3577,20 +3577,19 @@
 
             // Add last row if exists
             if (currentVal || currentRow.length) {
-                currentRow.push(currentVal.trim());
+                currentRow.push(currentVal);
                 if (currentRow.length > 0) rows.push(currentRow);
             }
 
             if (returnRaw) return rows;
             if (rows.length < 2) return [];
 
-            const headers = rows[0].map(h => h ? h.trim() : '');
+            // Process headers - trim whitespace
+            const headers = rows[0].map(h => (h || '').trim());
             
-            // DEBUG: Log headers for Alumni sheet
-            if (headers.includes('testimonial_en') || headers.includes('testimonial_tr')) {
-                console.log('Alumni CSV Headers:', headers);
-                console.log('Alumni First Row:', rows[1]);
-            }
+            // DEBUG
+            console.log('Parsed headers:', headers);
+            console.log('First data row:', rows[1]);
             
             const data = [];
 
@@ -3600,7 +3599,8 @@
                 headers.forEach((h, idx) => {
                     if (!h) return; // skip empty headers
                     const key = h.toLowerCase().replace(/\s+/g, '_');
-                    row[key] = values[idx] !== undefined ? values[idx] : '';
+                    const val = values[idx];
+                    row[key] = val !== undefined ? val.trim() : '';
                 });
                 data.push(row);
             }
