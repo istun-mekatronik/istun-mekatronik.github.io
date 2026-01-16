@@ -3541,54 +3541,40 @@
         }
 
         function parseCSV(csvText, returnRaw = false) {
-            // Simpler line-by-line CSV parser
-            const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(l => l.trim());
+            const lines = csvText.trim().split('\n');
             const rows = [];
             
-            for (const line of lines) {
-                const row = [];
+            for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+                const line = lines[lineIdx];
+                const values = [];
                 let current = '';
                 let inQuotes = false;
                 
-                for (let i = 0; i < line.length; i++) {
-                    const char = line[i];
-                    
-                    if (char === '"') {
-                        if (inQuotes && line[i + 1] === '"') {
-                            current += '"';
-                            i++;
-                        } else {
-                            inQuotes = !inQuotes;
-                        }
-                    } else if (char === ',' && !inQuotes) {
-                        row.push(current);
+                for (let c of line) {
+                    if (c === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (c === ',' && !inQuotes) {
+                        values.push(current);
                         current = '';
                     } else {
-                        current += char;
+                        current += c;
                     }
                 }
-                row.push(current);
-                rows.push(row);
+                values.push(current);
+                rows.push(values);
             }
 
             if (returnRaw) return rows;
             if (rows.length < 2) return [];
 
             const headers = rows[0];
-            
-            // Debug for Alumni
-            if (headers.some(h => h.includes('testimonial'))) {
-                console.log('ALUMNI Headers:', headers);
-                console.log('ALUMNI First data:', rows[1]);
-            }
-            
             const data = [];
+            
             for (let i = 1; i < rows.length; i++) {
                 const values = rows[i];
                 const row = {};
                 headers.forEach((h, idx) => {
-                    const key = h.toLowerCase().replace(/\s+/g, '_').trim();
-                    if (key) row[key] = values[idx] || '';
+                    row[h.toLowerCase()] = values[idx] || '';
                 });
                 data.push(row);
             }
@@ -3600,15 +3586,7 @@
                 const response = await fetch(getSheetURL(tabName), { cache: 'no-store' });
                 if (!response.ok) throw new Error('Failed to fetch');
                 const csv = await response.text();
-                
-                // DEBUG: Log raw CSV for Alumni
-                if (tabName === 'Alumni') {
-                    console.log('=== RAW ALUMNI CSV ===');
-                    console.log(csv);
-                    console.log('=== END RAW CSV ===');
-                }
-                
-                return parseCSV(csv, tabName === 'Settings'); // Use raw mode for Settings
+                return parseCSV(csv, tabName === 'Settings');
             } catch (err) {
                 console.error(`Error fetching ${tabName}:`, err);
                 return [];
