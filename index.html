@@ -3541,86 +3541,57 @@
         }
 
         function parseCSV(csvText, returnRaw = false) {
+            // Simpler line-by-line CSV parser
+            const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(l => l.trim());
             const rows = [];
-            let currentRow = [];
-            let currentVal = '';
-            let inQuotes = false;
-
-            // Normalize line endings to \n
-            const csv = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-            for (let i = 0; i < csv.length; i++) {
-                const char = csv[i];
-                const nextChar = csv[i + 1];
-
-                if (char === '"') {
-                    if (inQuotes && nextChar === '"') {
-                        currentVal += '"';
-                        i++; // skip escaped quote
+            
+            for (const line of lines) {
+                const row = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (char === '"') {
+                        if (inQuotes && line[i + 1] === '"') {
+                            current += '"';
+                            i++;
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        row.push(current);
+                        current = '';
                     } else {
-                        inQuotes = !inQuotes;
+                        current += char;
                     }
-                } else if (char === ',' && !inQuotes) {
-                    currentRow.push(currentVal);
-                    currentVal = '';
-                } else if (char === '\n' && !inQuotes) {
-                    currentRow.push(currentVal);
-                    if (currentRow.length > 0 && (currentRow.length > 1 || currentRow[0] !== '')) {
-                        rows.push(currentRow);
-                    }
-                    currentRow = [];
-                    currentVal = '';
-                } else {
-                    currentVal += char;
                 }
-            }
-
-            // Add last row if exists
-            if (currentVal || currentRow.length) {
-                currentRow.push(currentVal);
-                if (currentRow.length > 0) rows.push(currentRow);
+                row.push(current);
+                rows.push(row);
             }
 
             if (returnRaw) return rows;
             if (rows.length < 2) return [];
 
-            // Process headers - trim whitespace
-            const headers = rows[0].map(h => (h || '').trim());
+            const headers = rows[0];
             
-            // DEBUG: Check if this is Alumni sheet
-            const isAlumni = headers.includes('testimonial_en');
-            if (isAlumni) {
-                console.log('=== ALUMNI PARSING DEBUG ===');
-                console.log('Headers array:', JSON.stringify(headers));
-                console.log('Headers[1] (should be year):', headers[1]);
-                console.log('First data row array:', JSON.stringify(rows[1]));
-                console.log('rows[1][1] (should be 2021):', rows[1][1]);
+            // Debug for Alumni
+            if (headers.some(h => h.includes('testimonial'))) {
+                console.log('ALUMNI Headers:', headers);
+                console.log('ALUMNI First data:', rows[1]);
             }
             
             const data = [];
-
             for (let i = 1; i < rows.length; i++) {
                 const values = rows[i];
                 const row = {};
                 headers.forEach((h, idx) => {
-                    if (!h) return; // skip empty headers
-                    const key = h.toLowerCase().replace(/\s+/g, '_');
-                    const val = values[idx];
-                    // Handle value safely - could be string, number, null, undefined
-                    row[key] = (val !== undefined && val !== null) ? String(val).trim() : '';
+                    const key = h.toLowerCase().replace(/\s+/g, '_').trim();
+                    if (key) row[key] = values[idx] || '';
                 });
-                // DEBUG: Log first alumni row
-                if (isAlumni && i === 1) {
-                    console.log('First alumni object built:', JSON.stringify(row));
-                    console.log('row.year value:', row.year);
-                }
                 data.push(row);
             }
-            
-            if (isAlumni) {
-                console.log('=== END ALUMNI PARSING DEBUG ===');
-            }
-            
             return data;
         }
 
