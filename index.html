@@ -3587,9 +3587,15 @@
             // Process headers - trim whitespace
             const headers = rows[0].map(h => (h || '').trim());
             
-            // DEBUG
-            console.log('Parsed headers:', headers);
-            console.log('First data row:', rows[1]);
+            // DEBUG: Check if this is Alumni sheet
+            const isAlumni = headers.includes('testimonial_en');
+            if (isAlumni) {
+                console.log('=== ALUMNI PARSING DEBUG ===');
+                console.log('Headers array:', JSON.stringify(headers));
+                console.log('Headers[1] (should be year):', headers[1]);
+                console.log('First data row array:', JSON.stringify(rows[1]));
+                console.log('rows[1][1] (should be 2021):', rows[1][1]);
+            }
             
             const data = [];
 
@@ -3600,10 +3606,21 @@
                     if (!h) return; // skip empty headers
                     const key = h.toLowerCase().replace(/\s+/g, '_');
                     const val = values[idx];
-                    row[key] = val !== undefined ? val.trim() : '';
+                    // Handle value safely - could be string, number, null, undefined
+                    row[key] = (val !== undefined && val !== null) ? String(val).trim() : '';
                 });
+                // DEBUG: Log first alumni row
+                if (isAlumni && i === 1) {
+                    console.log('First alumni object built:', JSON.stringify(row));
+                    console.log('row.year value:', row.year);
+                }
                 data.push(row);
             }
+            
+            if (isAlumni) {
+                console.log('=== END ALUMNI PARSING DEBUG ===');
+            }
+            
             return data;
         }
 
@@ -3615,9 +3632,8 @@
                 
                 // DEBUG: Log raw CSV for Alumni
                 if (tabName === 'Alumni') {
-                    alert('NEW VERSION LOADED - v2');
                     console.log('=== RAW ALUMNI CSV ===');
-                    console.log(csv.substring(0, 500)); // First 500 chars
+                    console.log(csv);
                     console.log('=== END RAW CSV ===');
                 }
                 
