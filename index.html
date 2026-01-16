@@ -3612,6 +3612,14 @@
                 const response = await fetch(getSheetURL(tabName), { cache: 'no-store' });
                 if (!response.ok) throw new Error('Failed to fetch');
                 const csv = await response.text();
+                
+                // DEBUG: Log raw CSV for Alumni
+                if (tabName === 'Alumni') {
+                    console.log('=== RAW ALUMNI CSV ===');
+                    console.log(csv.substring(0, 500)); // First 500 chars
+                    console.log('=== END RAW CSV ===');
+                }
+                
                 return parseCSV(csv, tabName === 'Settings'); // Use raw mode for Settings
             } catch (err) {
                 console.error(`Error fetching ${tabName}:`, err);
