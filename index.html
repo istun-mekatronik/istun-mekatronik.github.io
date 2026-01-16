@@ -4,7 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="İSTUN Mechatronics Engineering Department - Research, Education, and Innovation in Intelligent Systems">
+    <meta name="keywords" content="mechatronics, engineering, robotics, automation, İSTUN, research">
+    <meta property="og:title" content="İSTUN Mechatronics Engineering">
+    <meta property="og:description" content="Research, Education, and Innovation in Intelligent Systems">
+    <meta property="og:type" content="website">
     <title>İSTUN Mechatronics Engineering</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%236366f1' rx='15' width='100' height='100'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='white'>⚙</text></svg>">
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
@@ -59,6 +65,7 @@
             --border: #e5e2dc;
             --border-dark: #d1cdc4;
             --text-main: #1a1a1a;
+            --text: #1a1a1a;
             --text-secondary: #374151;
             --text-muted: #64748b;
             --text-light: #94a3b8;
@@ -383,6 +390,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .header-btn .badge:empty,
+        .header-btn .badge[data-count="0"] {
+            display: none;
         }
 
         /* LAYOUT */
@@ -2160,7 +2172,7 @@
                 <button class="lang-btn" onclick="setLang('tr')">TR</button>
             </div>
             <button class="header-btn"><i class="fa-solid fa-bell"></i><span class="badge"
-                    id="notifBadge">0</span></button>
+                    id="notifBadge" data-count="0">0</span></button>
         </div>
     </header>
 
@@ -2213,7 +2225,7 @@
             <div class="nav-section">
                 <div class="nav-section-title">Resources</div>
                 <a class="nav-item" data-page="jobs" onclick="goTo('jobs', this)"><i class="fa-solid fa-briefcase"></i>
-                    <span data-en>Jobs</span><span data-tr>İş</span> <span class="nav-badge green"
+                    <span data-en>Jobs</span><span data-tr>İş İlanları</span> <span class="nav-badge green"
                         id="jobsBadge">0</span></a>
                 <a class="nav-item" data-page="partners" onclick="goTo('partners', this)"><i
                         class="fa-solid fa-handshake"></i> <span data-en>Partners</span><span
@@ -2226,7 +2238,7 @@
                         Event</span><span data-tr>Etkinlik</span></div>
                 <p id="nextEventText">Loading...</p>
                 <button class="btn btn-sm btn-ghost" style="width:100%;" onclick="goTo('news')"><span data-en>View
-                        Calendar</span><span data-tr>Takvim</span></button>
+                        Events</span><span data-tr>Etkinlikler</span></button>
             </div>
             
             <!-- Data Panel Dropdown -->
@@ -3416,7 +3428,14 @@
                         }
                     }
                 });
-                console.log('Parsed Settings:', settings);
+                
+                // Extract and hash admin password if present in sheet
+                if (settings.admin_password) {
+                    ADMIN_CONFIG.sheetPasswordHash = await secureHash(settings.admin_password);
+                    // Remove from settings object so it's not exposed
+                    delete settings.admin_password;
+                }
+                
                 return settings;
             } catch (err) {
                 console.error('Error parsing settings:', err);
@@ -3484,6 +3503,15 @@
         function renderNews() {
             const news = DATA.news.slice(0, 6);
             document.getElementById('newsBadge').textContent = DATA.news.length;
+            
+            // Update notification badge with upcoming events count
+            const upcomingEventsCount = DATA.events.filter(e => {
+                const eventDate = new Date(e.date);
+                return eventDate >= new Date();
+            }).length;
+            const notifBadge = document.getElementById('notifBadge');
+            notifBadge.textContent = upcomingEventsCount;
+            notifBadge.setAttribute('data-count', upcomingEventsCount);
 
             const newsHTML = news.slice(0, 3).map((n, i) => {
                 const d = formatDate(n.date);
@@ -3503,7 +3531,7 @@
             `;
             }).join('');
 
-            document.getElementById('latestNews').innerHTML = newsHTML || '<p>No news available.</p>';
+            document.getElementById('latestNews').innerHTML = newsHTML || `<p>${t('No news available.', 'Haber bulunamadı.')}</p>`;
             document.getElementById('allNews').innerHTML = DATA.news.map((n, i) => {
                 const d = formatDate(n.date);
                 return `
@@ -3518,7 +3546,7 @@
                     </div>
                 </div>
             `;
-            }).join('') || '<p>No news.</p>';
+            }).join('') || `<p>${t('No news.', 'Haber yok.')}</p>`;
         }
 
         function renderEvents() {
@@ -3535,8 +3563,8 @@
             </div>
         `).join('');
 
-            document.getElementById('upcomingEvents').innerHTML = eventsHTML || '<p>No upcoming events.</p>';
-            document.getElementById('allEvents').innerHTML = eventsHTML || '<p>No events.</p>';
+            document.getElementById('upcomingEvents').innerHTML = eventsHTML || `<p>${t('No upcoming events.', 'Yaklaşan etkinlik yok.')}</p>`;
+            document.getElementById('allEvents').innerHTML = eventsHTML || `<p>${t('No events.', 'Etkinlik yok.')}</p>`;
 
             // Next event card
             if (events[0]) {
@@ -3562,7 +3590,7 @@
                 <div class="card-footer"><span>${r.lead}</span><span class="card-footer-link">${t('Learn more', 'Detaylar')} →</span></div>
             </div>
         `).join('');
-            document.getElementById('featuredResearch').innerHTML = featuredHTML || '<p>No research groups.</p>';
+            document.getElementById('featuredResearch').innerHTML = featuredHTML || `<p>${t('No research groups.', 'Araştırma grubu yok.')}</p>`;
 
             // Full list
             const fullHTML = DATA.research.map((r, i) => `
@@ -3581,7 +3609,7 @@
                 </div>
             </div>
         `).join('');
-            document.getElementById('researchGroups').innerHTML = fullHTML || '<p>No research groups.</p>';
+            document.getElementById('researchGroups').innerHTML = fullHTML || `<p>${t('No research groups.', 'Araştırma grubu yok.')}</p>`;
         }
 
         function renderFaculty() {
@@ -3598,7 +3626,7 @@
                 </div>
             </div>
         `).join('');
-            document.getElementById('facultyGrid').innerHTML = html || '<p>No faculty data.</p>';
+            document.getElementById('facultyGrid').innerHTML = html || `<p>${t('No faculty data.', 'Akademisyen verisi yok.')}</p>`;
         }
 
         function goToProfile(name) {
@@ -3762,7 +3790,7 @@
                 <span class="tag ${getTagClass(j.type)}">${j.type || 'Job'}</span>
             </div>
         `).join('');
-            document.getElementById('jobsList').innerHTML = html || '<p>No jobs available.</p>';
+            document.getElementById('jobsList').innerHTML = html || `<p>${t('No jobs available.', 'İş ilanı bulunamadı.')}</p>`;
         }
 
         function renderAlumni() {
@@ -3782,7 +3810,7 @@
                 </div>
             </div>
         `).join('');
-            document.getElementById('alumniList').innerHTML = html || '<p>No alumni data.</p>';
+            document.getElementById('alumniList').innerHTML = html || `<p>${t('No alumni data.', 'Mezun verisi yok.')}</p>`;
         }
 
         function renderStudents() {
@@ -3795,7 +3823,7 @@
                 <td>${s.year}</td>
             </tr>
         `).join('');
-            document.getElementById('studentsBody').innerHTML = html || '<tr><td colspan="5">No students.</td></tr>';
+            document.getElementById('studentsBody').innerHTML = html || `<tr><td colspan="5">${t('No students.', 'Öğrenci yok.')}</td></tr>`;
         }
 
         function renderPartners() {
@@ -3807,7 +3835,7 @@
                     `<span style="color:var(--text-muted);font-weight:600;">${p.name}</span>`
             ).join('');
 
-            document.getElementById('industryPartners').innerHTML = industryHTML || '<p>No partners.</p>';
+            document.getElementById('industryPartners').innerHTML = industryHTML || `<p>${t('No partners.', 'Ortak yok.')}</p>`;
             document.getElementById('homePartners').innerHTML = industryHTML;
 
             const academicHTML = academic.map(p => `
@@ -3819,7 +3847,7 @@
                 </div>
             </div>
         `).join('');
-            document.getElementById('academicPartners').innerHTML = academicHTML || '<p>No academic partners.</p>';
+            document.getElementById('academicPartners').innerHTML = academicHTML || `<p>${t('No academic partners.', 'Akademik ortak yok.')}</p>`;
         }
 
         function renderContact() {
@@ -4301,7 +4329,9 @@
         
         function highlightMatch(text, query) {
             if (!text) return '';
-            const regex = new RegExp(`(${query})`, 'gi');
+            // Escape special regex characters to prevent errors
+            const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedQuery})`, 'gi');
             return text.replace(regex, '<mark style="background:#fef08a;padding:0 2px;border-radius:2px;">$1</mark>');
         }
         
@@ -4556,7 +4586,7 @@
                 </div>
                 
                 <!-- Sheet Editor (hidden until login) -->
-                <div id="adminSheetEditor" style="display:none; height:100%; display:flex; flex-direction:column;">
+                <div id="adminSheetEditor" style="display:none; height:100%; flex-direction:column;">
                     <div class="admin-tabs">
                         <button class="admin-tab active" onclick="showAdminTab('embed')"><i class="fa-solid fa-table"></i> <span data-en>Edit Data</span><span data-tr>Veri Düzenle</span></button>
                         <button class="admin-tab" onclick="showAdminTab('settings')"><i class="fa-solid fa-cog"></i> <span data-en>Settings</span><span data-tr>Ayarlar</span></button>
@@ -4564,8 +4594,12 @@
                     
                     <div id="adminTabEmbed" class="admin-tab-content" style="flex:1; display:flex; flex-direction:column;">
                         <p class="admin-desc"><span data-en>Edit your Google Sheet directly:</span><span data-tr>Google Sheet'inizi doğrudan düzenleyin:</span></p>
-                        <div class="sheet-embed-container" style="flex:1; min-height:300px;">
-                            <iframe id="sheetEmbed" src="" frameborder="0" style="width:100%; height:100%; min-height:300px; border-radius:8px; border:1px solid #e2e0dc;"></iframe>
+                        <div class="sheet-embed-container" style="flex:1; min-height:300px; position:relative;">
+                            <div id="sheetLoadingIndicator" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--text-muted);">
+                                <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem; margin-bottom:0.5rem;"></i>
+                                <p><span data-en>Loading Google Sheet...</span><span data-tr>Google Sheet yükleniyor...</span></p>
+                            </div>
+                            <iframe id="sheetEmbed" src="" frameborder="0" style="width:100%; height:100%; min-height:300px; border-radius:8px; border:1px solid #e2e0dc;" onload="document.getElementById('sheetLoadingIndicator').style.display='none';"></iframe>
                         </div>
                         <div class="admin-actions" style="margin-top:1rem;">
                             <a href="" id="openSheetLink" target="_blank" class="btn btn-ghost">
@@ -4587,6 +4621,7 @@
                             <label><span data-en>Change Admin Password</span><span data-tr>Yönetici Şifresini Değiştir</span></label>
                             <input type="password" id="settingCurrentPassword" class="admin-input" style="width:100%; margin-bottom:0.5rem;" placeholder="Current password / Mevcut şifre">
                             <input type="password" id="settingNewPassword" class="admin-input" style="width:100%;" placeholder="New password / Yeni şifre">
+                            <p class="admin-hint"><i class="fa-solid fa-lightbulb" style="color:var(--amber);"></i> <span data-en>Tip: You can also set password in your Google Sheet by adding a row with key "admin_password" in the Settings tab.</span><span data-tr>İpucu: Google Sheet'inizde Settings sekmesine "admin_password" anahtarıyla bir satır ekleyerek de şifre belirleyebilirsiniz.</span></p>
                         </div>
                         <button class="btn btn-accent" onclick="saveAdminSettings()">
                             <i class="fa-solid fa-save"></i> <span data-en>Save Settings</span><span data-tr>Ayarları Kaydet</span>
@@ -4749,7 +4784,15 @@
         // SIDEBAR DATA PANEL & ADMIN FUNCTIONS
         // ═══════════════════════════════════════════════════════════════════════════
         
-        // Simple hash function for password storage
+        // SHA-256 hash function for secure password storage
+        async function secureHash(str) {
+            const msgBuffer = new TextEncoder().encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        // Synchronous simple hash for backward compatibility (will be migrated)
         function simpleHash(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -4760,12 +4803,48 @@
             return hash.toString(36);
         }
         
-        // Config stored in localStorage (password is hashed)
-        const DEFAULT_PWD_HASH = simpleHash('admin123');
+        // Config stored in localStorage
+        // Password can be set in Google Sheet Settings tab with key: admin_password
+        // If not set in sheet, falls back to localStorage, then to default
         const ADMIN_CONFIG = {
-            passwordHash: localStorage.getItem('adminPasswordHash') || DEFAULT_PWD_HASH,
+            passwordHash: localStorage.getItem('adminPasswordHash') || null,
+            sheetPasswordHash: null, // Will be set after loading settings
             sheetId: localStorage.getItem('sheetId') || GOOGLE_SHEET_ID
         };
+        
+        // Check password against both sheet password and local password
+        async function verifyPassword(pwd) {
+            const pwdHash = await secureHash(pwd);
+            
+            // First check: Sheet password (if configured)
+            if (ADMIN_CONFIG.sheetPasswordHash) {
+                if (pwdHash === ADMIN_CONFIG.sheetPasswordHash) return true;
+            }
+            
+            // Second check: Local password
+            if (ADMIN_CONFIG.passwordHash) {
+                // Check new secure hash
+                if (pwdHash === ADMIN_CONFIG.passwordHash) return true;
+                // Backward compatibility: check old simple hash
+                if (simpleHash(pwd) === ADMIN_CONFIG.passwordHash) {
+                    // Migrate to secure hash
+                    localStorage.setItem('adminPasswordHash', pwdHash);
+                    ADMIN_CONFIG.passwordHash = pwdHash;
+                    return true;
+                }
+            }
+            
+            // Default password check (only if no password is configured anywhere)
+            if (!ADMIN_CONFIG.sheetPasswordHash && !ADMIN_CONFIG.passwordHash) {
+                const defaultHash = await secureHash('admin123');
+                if (pwdHash === defaultHash) {
+                    console.warn('⚠️ Using default password. Please change it in Settings or Google Sheet!');
+                    return true;
+                }
+            }
+            
+            return false;
+        }
         
         // Toggle sidebar data panel
         function toggleDataPanel() {
@@ -4809,11 +4888,11 @@
             document.getElementById('adminPassword').value = '';
         }
         
-        function checkAdminLogin() {
+        async function checkAdminLogin() {
             const pwd = document.getElementById('adminPassword').value;
-            const pwdHash = simpleHash(pwd);
+            const isValid = await verifyPassword(pwd);
             
-            if (pwdHash === ADMIN_CONFIG.passwordHash) {
+            if (isValid) {
                 document.getElementById('adminLoginForm').style.display = 'none';
                 document.getElementById('adminSheetEditor').style.display = 'flex';
                 
@@ -4836,7 +4915,7 @@
             tabContent.style.display = tab === 'embed' ? 'flex' : 'block';
         }
         
-        function saveAdminSettings() {
+        async function saveAdminSettings() {
             const newSheetId = document.getElementById('settingSheetId').value.trim();
             const currentPwd = document.getElementById('settingCurrentPassword').value.trim();
             const newPwd = document.getElementById('settingNewPassword').value.trim();
@@ -4854,11 +4933,12 @@
                     alert(lang === 'tr' ? 'Mevcut şifreyi girin' : 'Enter current password');
                     return;
                 }
-                if (simpleHash(currentPwd) !== ADMIN_CONFIG.passwordHash) {
+                const isCurrentValid = await verifyPassword(currentPwd);
+                if (!isCurrentValid) {
                     alert(lang === 'tr' ? 'Mevcut şifre yanlış' : 'Current password is incorrect');
                     return;
                 }
-                const newHash = simpleHash(newPwd);
+                const newHash = await secureHash(newPwd);
                 localStorage.setItem('adminPasswordHash', newHash);
                 ADMIN_CONFIG.passwordHash = newHash;
             }
