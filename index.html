@@ -3584,15 +3584,16 @@
             if (returnRaw) return rows;
             if (rows.length < 2) return [];
 
-            const headers = rows[0];
+            const headers = rows[0].map(h => h ? h.trim() : '');
             const data = [];
 
             for (let i = 1; i < rows.length; i++) {
                 const values = rows[i];
                 const row = {};
                 headers.forEach((h, idx) => {
+                    if (!h) return; // skip empty headers
                     const key = h.toLowerCase().replace(/\s+/g, '_');
-                    row[key] = values[idx];
+                    row[key] = values[idx] !== undefined ? values[idx] : '';
                 });
                 data.push(row);
             }
@@ -4073,15 +4074,20 @@
             <div class="stat-card"><span class="stat-value">${s.alumni_startups || '8'}</span><div class="stat-label">${t('Startups', 'Girişim')}</div></div>
         `;
 
-            const html = DATA.alumni.map(a => `
+            const html = DATA.alumni.map(a => {
+                // Handle year - could be number, string, or undefined
+                const yearVal = a.year !== undefined && a.year !== null && a.year !== '' ? String(a.year).trim() : '';
+                const yearDisplay = yearVal ? ` (${yearVal})` : '';
+                return `
             <div class="card-compact">
                 <img src="${a.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.name || 'A')}&background=6366f1&color=fff&size=80`}" style="width:44px;height:44px;border-radius:50%;" alt="">
                 <div class="card-compact-content">
-                    <h4>${a.name}${a.year ? ` (${a.year})` : ''}</h4>
+                    <h4>${a.name || ''}${yearDisplay}</h4>
                     <p>${a.position || ''} @ ${a.company || ''}</p>
                 </div>
             </div>
-        `).join('');
+            `;
+            }).join('');
             document.getElementById('alumniList').innerHTML = html || `<p>${t('No alumni data.', 'Mezun verisi yok.')}</p>`;
         }
 
