@@ -1466,6 +1466,27 @@
             border-radius: 50%;
         }
 
+        .research-card-footer {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            text-align: right;
+        }
+
+        .research-card-footer .card-footer-link {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .research-card.card-clickable {
+            cursor: pointer;
+        }
+
+        .research-card.card-clickable:hover .card-footer-link {
+            text-decoration: underline;
+        }
+
         /* TIMELINE */
         .timeline {
             position: relative;
@@ -2764,7 +2785,7 @@
                             
                             <div id="eventRegisterBox" class="detail-actions" style="display:none;">
                                 <a href="#" id="eventRegisterLink" class="btn btn-accent" target="_blank">
-                                    <i class="fa-solid fa-calendar-plus"></i> <span data-en>Register Now</span><span data-tr>Åžimdi Kayıt Ol</span>
+                                    <i class="fa-solid fa-calendar-plus"></i> <span data-en>Register Now</span><span data-tr>Şimdi Kayıt Ol</span>
                                 </a>
                             </div>
                         </div>
@@ -2868,6 +2889,60 @@
                 </div>
             </div>
 
+            <!-- RESEARCH DETAIL PAGE -->
+            <div id="research-detail" class="page">
+                <div class="detail-page">
+                    <button onclick="goTo('research')" class="btn btn-ghost btn-sm detail-back">
+                        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Research</span><span data-tr>Araştırmaya Dön</span>
+                    </button>
+                    
+                    <div class="detail-card">
+                        <div class="detail-image" id="researchDetailImage"></div>
+                        <div class="detail-body">
+                            <div class="detail-meta">
+                                <span class="tag tag-green" id="researchDetailType">Research</span>
+                            </div>
+                            <h1 class="detail-title" id="researchDetailTitle">Loading...</h1>
+                            <p class="detail-subtitle" id="researchDetailFocus"></p>
+                            
+                            <div class="detail-info-grid">
+                                <div class="detail-info-item">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    <div>
+                                        <span class="detail-info-label"><span data-en>Lead Researcher</span><span data-tr>Araştırma Lideri</span></span>
+                                        <span class="detail-info-value" id="researchDetailLead"></span>
+                                    </div>
+                                </div>
+                                <div class="detail-info-item">
+                                    <i class="fa-solid fa-users"></i>
+                                    <div>
+                                        <span class="detail-info-label"><span data-en>Team Size</span><span data-tr>Ekip Büyüklüğü</span></span>
+                                        <span class="detail-info-value" id="researchDetailMembers"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-content" id="researchDetailContent"></div>
+                            
+                            <div class="detail-equipment-box" id="researchPublicationsBox">
+                                <h4><i class="fa-solid fa-book"></i> <span data-en>Key Publications</span><span data-tr>Önemli Yayınlar</span></h4>
+                                <p id="researchDetailPublications"></p>
+                            </div>
+                            
+                            <div class="detail-equipment-box" id="researchProjectsBox">
+                                <h4><i class="fa-solid fa-flask"></i> <span data-en>Active Projects</span><span data-tr>Aktif Projeler</span></h4>
+                                <p id="researchDetailProjects"></p>
+                            </div>
+                            
+                            <div class="detail-equipment-box" id="researchEquipmentBox">
+                                <h4><i class="fa-solid fa-wrench"></i> <span data-en>Equipment & Tools</span><span data-tr>Ekipman ve Araçlar</span></h4>
+                                <p id="researchDetailEquipment"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- JOB DETAIL PAGE -->
             <div id="job-detail" class="page">
                 <div class="detail-page">
@@ -2886,7 +2961,7 @@
                                 <div class="detail-info-item">
                                     <i class="fa-solid fa-building"></i>
                                     <div>
-                                        <span class="detail-info-label"><span data-en>Company</span><span data-tr>Åžirket</span></span>
+                                        <span class="detail-info-label"><span data-en>Company</span><span data-tr>Şirket</span></span>
                                         <span class="detail-info-value" id="jobDetailCompany"></span>
                                     </div>
                                 </div>
@@ -2917,7 +2992,7 @@
                             
                             <div id="jobApplyBox" class="detail-actions" style="display:none;">
                                 <a href="#" id="jobApplyLink" class="btn btn-accent" target="_blank">
-                                    <i class="fa-solid fa-paper-plane"></i> <span data-en>Apply Now</span><span data-tr>Åžimdi Başvur</span>
+                                    <i class="fa-solid fa-paper-plane"></i> <span data-en>Apply Now</span><span data-tr>Şimdi Başvur</span>
                                 </a>
                             </div>
                         </div>
@@ -3718,9 +3793,12 @@
             const colors = ['#10b981', '#6366f1', '#ec4899', '#14b8a6', '#f59e0b'];
             const icons = ['fa-robot', 'fa-microchip', 'fa-star', 'fa-hand', 'fa-bolt'];
 
-            // Featured on home (max 3)
-            const featuredHTML = DATA.research.slice(0, 3).map((r, i) => `
-            <div class="card card-clickable" onclick="goTo('research')">
+            // Randomize featured research on home (pick 3 random)
+            const shuffled = [...DATA.research].sort(() => Math.random() - 0.5);
+            const featured = shuffled.slice(0, 3);
+            
+            const featuredHTML = featured.map((r, i) => `
+            <div class="card card-clickable" onclick="goToResearchDetail(${DATA.research.indexOf(r)})">
                 <div class="card-img" style="background-image:url('${r.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&q=80'}');">
                     <div class="card-img-overlay"></div>
                     <div class="card-img-badge"><span class="tag tag-green">${r.type || 'Lab'}</span></div>
@@ -3734,9 +3812,9 @@
         `).join('');
             document.getElementById('featuredResearch').innerHTML = featuredHTML || `<p>${t('No research groups.', 'Araştırma grubu yok.')}</p>`;
 
-            // Full list
+            // Full list with clickable cards
             const fullHTML = DATA.research.map((r, i) => `
-            <div class="research-card">
+            <div class="research-card card-clickable" onclick="goToResearchDetail(${i})">
                 <div class="research-header">
                     <div class="research-icon" style="background:linear-gradient(135deg, ${colors[i % colors.length]}, ${colors[(i + 1) % colors.length]});"><i class="fa-solid ${icons[i % icons.length]}"></i></div>
                     <div class="research-info">
@@ -3749,9 +3827,59 @@
                     <span class="research-member"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(r.lead || 'L')}&background=0f172a&color=fff&size=32" alt=""> ${r.lead} (Lead)</span>
                     ${r.members ? `<span class="research-member">+${r.members} members</span>` : ''}
                 </div>
+                <div class="research-card-footer">
+                    <span class="card-footer-link">${t('View Details', 'Detaylar')} →</span>
+                </div>
             </div>
         `).join('');
             document.getElementById('researchGroups').innerHTML = fullHTML || `<p>${t('No research groups.', 'Araştırma grubu yok.')}</p>`;
+        }
+
+        function goToResearchDetail(index) {
+            currentDetailPage = 'research';
+            currentDetailIndex = index;
+            const r = DATA.research[index];
+            if (!r) return;
+
+            document.getElementById('researchDetailTitle').textContent = t(r.name_en, r.name_tr);
+            document.getElementById('researchDetailFocus').textContent = r.focus || '';
+            document.getElementById('researchDetailType').textContent = r.type || 'Research';
+            document.getElementById('researchDetailLead').textContent = r.lead || '—';
+            document.getElementById('researchDetailMembers').textContent = r.members ? `${r.members} members` : '—';
+            document.getElementById('researchDetailImage').style.backgroundImage = `url('${r.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&q=80'}')`;
+            
+            // Content with proper line breaks
+            const content = t(r.content_en, r.content_tr) || t(r.description_en, r.description_tr);
+            document.getElementById('researchDetailContent').innerHTML = content ? content.replace(/\n/g, '<br>') : '';
+            
+            // Publications
+            const pubBox = document.getElementById('researchPublicationsBox');
+            if (r.publications) {
+                pubBox.style.display = 'block';
+                document.getElementById('researchDetailPublications').textContent = r.publications;
+            } else {
+                pubBox.style.display = 'none';
+            }
+            
+            // Projects
+            const projBox = document.getElementById('researchProjectsBox');
+            if (r.projects) {
+                projBox.style.display = 'block';
+                document.getElementById('researchDetailProjects').textContent = r.projects;
+            } else {
+                projBox.style.display = 'none';
+            }
+            
+            // Equipment
+            const equipBox = document.getElementById('researchEquipmentBox');
+            if (r.equipment) {
+                equipBox.style.display = 'block';
+                document.getElementById('researchDetailEquipment').textContent = r.equipment;
+            } else {
+                equipBox.style.display = 'none';
+            }
+
+            goTo('research-detail');
         }
 
         function renderFaculty() {
@@ -4187,6 +4315,7 @@
                 case 'project': goToProjectDetail(currentDetailIndex); break;
                 case 'lab': goToLabDetail(currentDetailIndex); break;
                 case 'job': goToJobDetail(currentDetailIndex); break;
+                case 'research': goToResearchDetail(currentDetailIndex); break;
                 case 'profile': if (currentProfileName) renderProfile(currentProfileName); break;
             }
         }
@@ -4744,7 +4873,7 @@
                 <div id="adminLoginForm" class="admin-section">
                     <p class="admin-desc"><span data-en>Enter password to access the data editor</span><span data-tr>Veri düzenleyiciye erişmek için şifre girin</span></p>
                     <div class="admin-input-group">
-                        <input type="password" id="adminPassword" placeholder="Password / Åžifre" class="admin-input" onkeypress="if(event.key==='Enter')checkAdminLogin()">
+                        <input type="password" id="adminPassword" placeholder="Password / Şifre" class="admin-input" onkeypress="if(event.key==='Enter')checkAdminLogin()">
                         <button class="btn btn-accent" onclick="checkAdminLogin()">
                             <i class="fa-solid fa-arrow-right"></i>
                         </button>
@@ -4787,7 +4916,7 @@
                             <p class="admin-hint"><span data-en>Found in the sheet URL after /d/</span><span data-tr>Sheet URL'sinde /d/ sonrasında bulunur</span></p>
                         </div>
                         <div class="settings-group">
-                            <label><span data-en>Change Admin Password</span><span data-tr>Yönetici Åžifresini Değiştir</span></label>
+                            <label><span data-en>Change Admin Password</span><span data-tr>Yönetici Şifresini Değiştir</span></label>
                             <input type="password" id="settingCurrentPassword" class="admin-input" style="width:100%; margin-bottom:0.5rem;" placeholder="Current password / Mevcut şifre">
                             <input type="password" id="settingNewPassword" class="admin-input" style="width:100%;" placeholder="New password / Yeni şifre">
                             <p class="admin-hint"><i class="fa-solid fa-lightbulb" style="color:var(--amber);"></i> <span data-en>Tip: You can also set password in your Google Sheet by adding a row with key "admin_password" in the Settings tab.</span><span data-tr>İpucu: Google Sheet'inizde Settings sekmesine "admin_password" anahtarıyla bir satır ekleyerek de şifre belirleyebilirsiniz.</span></p>
