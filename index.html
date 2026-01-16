@@ -3585,6 +3585,13 @@
             if (rows.length < 2) return [];
 
             const headers = rows[0].map(h => h ? h.trim() : '');
+            
+            // DEBUG: Log headers for Alumni sheet
+            if (headers.includes('testimonial_en') || headers.includes('testimonial_tr')) {
+                console.log('Alumni CSV Headers:', headers);
+                console.log('Alumni First Row:', rows[1]);
+            }
+            
             const data = [];
 
             for (let i = 1; i < rows.length; i++) {
