@@ -48,9 +48,6 @@
         `).join('');
     };
     
-    // Auto-render on load
-    if (typeof getData === 'function' && getData('research')) {
-        renderResearchPage();
-    }
+    // Render will be called by router after page loads
 })();
 </script>

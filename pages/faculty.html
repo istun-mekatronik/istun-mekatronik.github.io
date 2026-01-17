@@ -154,8 +154,8 @@ function renderProfile(name) {
         document.getElementById('profPublicationsSection').style.display = 'block';
         document.getElementById('profPublications').innerHTML = relatedPubs.slice(0, 5).map(p => `
             <div class="profile-related-item">
-                <h4>${p.title}</h4>
-                <p>${p.journal}, ${p.year}</p>
+                <h4>${p.title || ''}</h4>
+                <p>${p.journal || ''}${p.journal && p.year ? ', ' : ''}${p.year || ''}</p>
             </div>
         `).join('');
     } else {
@@ -172,9 +172,9 @@ function renderProfile(name) {
         document.getElementById('profCoursesSection').style.display = 'block';
         document.getElementById('profCourses').innerHTML = relatedCourses.map(c => `
             <div class="profile-related-item">
-                <span class="tag tag-accent">${c.code}</span>
-                <h4>${t(c.name_en, c.name_tr)}</h4>
-                <p>${c.ects} ECTS</p>
+                <span class="tag tag-accent">${c.code || ''}</span>
+                <h4>${t(c.name_en, c.name_tr) || ''}</h4>
+                <p>${c.ects ? c.ects + ' ECTS' : ''}</p>
             </div>
         `).join('');
     } else {

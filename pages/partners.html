@@ -78,9 +78,6 @@
         document.getElementById('researchPartners').innerHTML = researchHTML || `<p>${t('No research partners.', 'Araştırma ortağı yok.')}</p>`;
     };
     
-    // Auto-render on load
-    if (typeof getData === 'function' && getData('partners')) {
-        renderPartnersPage();
-    }
+    // Render will be called by router after page loads
 })();
 </script>

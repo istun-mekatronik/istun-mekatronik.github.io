@@ -163,7 +163,7 @@ const Router = {
             
             // Execute any script tags in the loaded HTML
             const scripts = pageDiv.querySelectorAll('script');
-            scripts.forEach(oldScript => {
+            for (const oldScript of scripts) {
                 const newScript = document.createElement('script');
                 if (oldScript.src) {
                     newScript.src = oldScript.src;
@@ -172,7 +172,10 @@ const Router = {
                 }
                 document.head.appendChild(newScript);
                 oldScript.remove();
-            });
+            }
+            
+            // Wait a tick for scripts to execute, then render
+            await new Promise(resolve => setTimeout(resolve, 10));
             
             // Execute page render function if data is ready
             const renderFn = window[`render${pageId.charAt(0).toUpperCase() + pageId.slice(1)}Page`];

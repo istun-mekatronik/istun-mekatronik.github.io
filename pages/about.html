@@ -52,7 +52,7 @@
         `;
     };
     
-    // Auto-render on load
+    // Render will be called by router after page loads
     if (typeof getSettings === 'function' && getSettings()) {
         renderAboutPage();
     }

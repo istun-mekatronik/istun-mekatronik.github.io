@@ -129,9 +129,6 @@
         }
     };
     
-    // Auto-render on load
-    if (typeof getData === 'function' && getData('projects')) {
-        renderProjectsPage();
-    }
+    // Render will be called by router after page loads
 })();
 </script>

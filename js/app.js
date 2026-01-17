@@ -161,8 +161,16 @@ function cleanText(str) {
 }
 
 // Get data accessor
-function getData() {
+function getData(key) {
+    if (key) {
+        return DataManager.data[key] || [];
+    }
     return DataManager.data;
+}
+
+// Translation helper
+function t(en, tr) {
+    return I18n.lang === 'tr' ? (tr || en) : en;
 }
 
 // Get settings accessor
