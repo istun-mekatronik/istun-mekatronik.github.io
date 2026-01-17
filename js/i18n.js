@@ -23,6 +23,13 @@ const I18n = {
         if (rerender && DataManager.data.settings) {
             App.renderAll();
             
+            // Re-render profile page if open
+            if (Router.currentPage === 'profile' && window.currentProfileName) {
+                if (typeof window.renderProfilePage === 'function') {
+                    window.renderProfilePage();
+                }
+            }
+            
             // Also re-render current detail page if one is open
             if (typeof window.currentDetailIndex === 'number' && window.currentDetailIndex >= 0) {
                 const pageId = Router.currentPage;

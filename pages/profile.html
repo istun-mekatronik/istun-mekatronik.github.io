@@ -6,7 +6,7 @@
 <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
     <div>
         <button class="btn btn-ghost btn-sm" onclick="Router.goTo('faculty')" style="margin-bottom:1rem;">
-            <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Faculty</span><span data-tr>Kadroya Dön</span>
+            <i class="fa-solid fa-arrow-left"></i> <span id="profileBackBtn">Back to Faculty</span>
         </button>
         <h1 id="profName">Loading...</h1>
         <p class="subtitle" id="profTitle"></p>
@@ -25,52 +25,52 @@
 
     <main class="profile-main">
         <div id="profBioSection">
-            <h2><span data-en>Biography</span><span data-tr>Biyografi</span></h2>
+            <h2 id="profileLabelBio">Biography</h2>
             <div class="profile-bio" id="profBio">...</div>
         </div>
 
         <div class="profile-meta-grid">
             <div class="meta-item">
-                <label><span data-en>Research Areas</span><span data-tr>Araştırma Alanları</span></label>
+                <label id="profileLabelResearch">Research Areas</label>
                 <p id="profResearch">...</p>
             </div>
             <div class="meta-item" id="profEducationSection">
-                <label><span data-en>Education</span><span data-tr>Eğitim</span></label>
+                <label id="profileLabelEducation">Education</label>
                 <p id="profEducation">...</p>
             </div>
             <div class="meta-item" id="profOfficeSection">
-                <label><span data-en>Office</span><span data-tr>Ofis</span></label>
+                <label id="profileLabelOffice">Office</label>
                 <p id="profOffice">...</p>
             </div>
         </div>
 
         <div id="profHonorsSection" style="display:none;">
-            <h2><span data-en>Honors & Awards</span><span data-tr>Ödüller</span></h2>
+            <h2 id="profileLabelHonors">Honors & Awards</h2>
             <p id="profHonors" class="profile-bio">...</p>
         </div>
         
         <div id="profPublicationsSection" style="display:none;">
-            <h2><span data-en>Publications</span><span data-tr>Yayınlar</span></h2>
+            <h2 id="profileLabelPubs">Publications</h2>
             <div id="profPublications" class="profile-related-list"></div>
         </div>
         
         <div id="profCoursesSection" style="display:none;">
-            <h2><span data-en>Courses Taught</span><span data-tr>Verilen Dersler</span></h2>
+            <h2 id="profileLabelCourses">Courses Taught</h2>
             <div id="profCourses" class="profile-related-list"></div>
         </div>
         
         <div id="profResearchSection" style="display:none;">
-            <h2><span data-en>Research Groups</span><span data-tr>Araştırma Grupları</span></h2>
+            <h2 id="profileLabelResearchGroups">Research Groups</h2>
             <div id="profResearchGroups" class="profile-related-list"></div>
         </div>
         
         <div id="profStudentsSection" style="display:none;">
-            <h2><span data-en>Students Advised</span><span data-tr>Danışmanlık Yapılan Öğrenciler</span></h2>
+            <h2 id="profileLabelStudents">Students Advised</h2>
             <div id="profStudents" class="profile-related-list"></div>
         </div>
         
         <div id="profProjectsSection" style="display:none;">
-            <h2><span data-en>Projects</span><span data-tr>Projeler</span></h2>
+            <h2 id="profileLabelProjects">Projects</h2>
             <div id="profProjects" class="profile-related-list"></div>
         </div>
     </main>
@@ -78,6 +78,27 @@
 
 <script>
 (function() {
+    // Navigation functions for related items
+    window.goToResearchFromProfile = function(index) {
+        window.currentDetailIndex = index;
+        Router.goTo('research-detail');
+        setTimeout(function() {
+            if (typeof window.renderResearchDetailPage === 'function') {
+                window.renderResearchDetailPage();
+            }
+        }, 150);
+    };
+    
+    window.goToProjectFromProfile = function(index) {
+        window.currentDetailIndex = index;
+        Router.goTo('project-detail');
+        setTimeout(function() {
+            if (typeof window.renderProjectDetailPage === 'function') {
+                window.renderProjectDetailPage();
+            }
+        }, 150);
+    };
+    
     window.renderProfilePage = function() {
         const name = window.currentProfileName;
         if (!name) {
@@ -95,6 +116,19 @@
             console.error('Faculty not found:', name);
             return;
         }
+        
+        // Update labels with current language
+        document.getElementById('profileBackBtn').textContent = t('Back to Faculty', 'Kadroya Dön');
+        document.getElementById('profileLabelBio').textContent = t('Biography', 'Biyografi');
+        document.getElementById('profileLabelResearch').textContent = t('Research Areas', 'Araştırma Alanları');
+        document.getElementById('profileLabelEducation').textContent = t('Education', 'Eğitim');
+        document.getElementById('profileLabelOffice').textContent = t('Office', 'Ofis');
+        document.getElementById('profileLabelHonors').textContent = t('Honors & Awards', 'Ödüller');
+        document.getElementById('profileLabelPubs').textContent = t('Publications', 'Yayınlar');
+        document.getElementById('profileLabelCourses').textContent = t('Courses Taught', 'Verilen Dersler');
+        document.getElementById('profileLabelResearchGroups').textContent = t('Research Groups', 'Araştırma Grupları');
+        document.getElementById('profileLabelStudents').textContent = t('Students Advised', 'Danışmanlık Yapılan Öğrenciler');
+        document.getElementById('profileLabelProjects').textContent = t('Projects', 'Projeler');
 
         // Header info
         document.getElementById('profName').textContent = f.name || '';
@@ -176,16 +210,13 @@
         const relatedCourses = (data.courses || []).filter(c => nameMatches(c.instructor));
         if (relatedCourses.length > 0) {
             document.getElementById('profCoursesSection').style.display = 'block';
-            document.getElementById('profCourses').innerHTML = relatedCourses.map((c, idx) => {
-                const courseIndex = data.courses.indexOf(c);
-                return `
+            document.getElementById('profCourses').innerHTML = relatedCourses.map(c => `
                 <div class="profile-related-item card-clickable" onclick="Router.goTo('courses')" style="cursor:pointer;">
                     <span class="tag tag-accent">${c.code || ''}</span>
                     <h4>${t(c.name_en, c.name_tr) || ''}</h4>
                     <p>${c.ects ? c.ects + ' ECTS' : ''}</p>
                 </div>
-            `;
-            }).join('');
+            `).join('');
         } else {
             document.getElementById('profCoursesSection').style.display = 'none';
         }
@@ -197,7 +228,7 @@
             document.getElementById('profResearchGroups').innerHTML = relatedResearch.map(r => {
                 const researchIndex = data.research.indexOf(r);
                 return `
-                <div class="profile-related-item card-clickable" onclick="window.currentDetailIndex=${researchIndex}; Router.goTo('research-detail'); setTimeout(() => window.renderResearchDetailPage && window.renderResearchDetailPage(), 100);" style="cursor:pointer;">
+                <div class="profile-related-item card-clickable" onclick="goToResearchFromProfile(${researchIndex})" style="cursor:pointer;">
                     <span class="tag tag-green">${r.type || 'Research'}</span>
                     <h4>${t(r.name_en, r.name_tr) || ''}</h4>
                     <p>${r.focus || t(r.description_en, r.description_tr) || ''}</p>
@@ -230,7 +261,7 @@
             document.getElementById('profProjects').innerHTML = relatedProjects.slice(0, 5).map(p => {
                 const projectIndex = data.projects.indexOf(p);
                 return `
-                <div class="profile-related-item card-clickable" onclick="window.currentDetailIndex=${projectIndex}; Router.goTo('project-detail'); setTimeout(() => window.renderProjectDetailPage && window.renderProjectDetailPage(), 100);" style="cursor:pointer;">
+                <div class="profile-related-item card-clickable" onclick="goToProjectFromProfile(${projectIndex})" style="cursor:pointer;">
                     <span class="tag ${getTagClass(p.category)}">${p.category || 'Project'}</span>
                     <h4>${t(p.title_en, p.title_tr) || ''}</h4>
                     <p>${p.year || ''}</p>
