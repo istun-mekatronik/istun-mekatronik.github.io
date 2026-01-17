@@ -2347,11 +2347,7 @@
                             <span class="text-muted"><span data-en>No changes</span><span data-tr>Değişiklik yok</span></span>
                         </div>
                     </div>
-                    <div class="data-admin-row">
-                        <button class="btn btn-ghost btn-sm" onclick="openAdminLogin()" style="width:100%;">
-                            <i class="fa-solid fa-shield-halved"></i> <span data-en>Admin Access</span><span data-tr>Yönetici Erişimi</span>
-                        </button>
-                    </div>
+                    <!-- Admin access hidden: use #admin in URL or Ctrl+Shift+A -->
                 </div>
             </div>
         </aside>
@@ -3699,12 +3695,8 @@
                     }
                 });
                 
-                // Extract and hash admin password if present in sheet
-                if (settings.admin_password) {
-                    ADMIN_CONFIG.sheetPasswordHash = await secureHash(settings.admin_password);
-                    // Remove from settings object so it's not exposed
-                    delete settings.admin_password;
-                }
+                // Note: admin_password is NO LONGER read from sheet for security
+                // Password is stored in localStorage only
                 
                 return settings;
             } catch (err) {
@@ -5017,7 +5009,11 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            // Check for #admin in URL
+            checkAdminAccess();
+        });
     </script>
 
     <!-- Admin Login Modal -->
@@ -5032,29 +5028,15 @@
             </div>
             
             <div class="admin-modal-body">
-                <!-- Login Form -->
-                <div id="adminLoginForm" class="admin-section">
-                    <p class="admin-desc"><span data-en>Enter password to access the data editor</span><span data-tr>Veri düzenleyiciye erişmek için şifre girin</span></p>
-                    <div class="admin-input-group">
-                        <input type="password" id="adminPassword" placeholder="Password / Şifre" class="admin-input" onkeypress="if(event.key==='Enter')checkAdminLogin()">
-                        <button class="btn btn-accent" onclick="checkAdminLogin()">
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    <p class="admin-hint" id="loginError" style="color:#ec4899; display:none;">
-                        <i class="fa-solid fa-exclamation-circle"></i> <span data-en>Incorrect password</span><span data-tr>Yanlış şifre</span>
-                    </p>
-                </div>
-                
-                <!-- Sheet Editor (hidden until login) -->
-                <div id="adminSheetEditor" style="display:none; height:100%; flex-direction:column;">
+                <!-- Sheet Editor (no login required - security via Google permissions) -->
+                <div id="adminSheetEditor" style="display:flex; height:100%; flex-direction:column;">
                     <div class="admin-tabs">
                         <button class="admin-tab active" onclick="showAdminTab('embed')"><i class="fa-solid fa-table"></i> <span data-en>Edit Data</span><span data-tr>Veri Düzenle</span></button>
                         <button class="admin-tab" onclick="showAdminTab('settings')"><i class="fa-solid fa-cog"></i> <span data-en>Settings</span><span data-tr>Ayarlar</span></button>
                     </div>
                     
                     <div id="adminTabEmbed" class="admin-tab-content" style="flex:1; display:flex; flex-direction:column;">
-                        <p class="admin-desc"><span data-en>Edit your Google Sheet directly:</span><span data-tr>Google Sheet'inizi doğrudan düzenleyin:</span></p>
+                        <p class="admin-desc"><span data-en>Edit your Google Sheet directly (requires Google login with edit access):</span><span data-tr>Google Sheet'inizi doğrudan düzenleyin (düzenleme yetkisi olan Google girişi gerektirir):</span></p>
                         <div class="sheet-embed-container" style="flex:1; min-height:300px; position:relative;">
                             <div id="sheetLoadingIndicator" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--text-muted);">
                                 <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem; margin-bottom:0.5rem;"></i>
@@ -5077,12 +5059,11 @@
                         <!-- Security Info Box -->
                         <div class="settings-group" style="background:linear-gradient(135deg, #dbeafe, #e0e7ff); padding:1rem; border-radius:8px; border-left:4px solid var(--accent); margin-bottom:1rem;">
                             <p style="margin:0; font-weight:600; color:#1e40af;"><i class="fa-solid fa-shield-halved"></i> 
-                            <span data-en>How Security Works</span><span data-tr>Güvenlik Nasıl Çalışır</span></p>
+                            <span data-en>Security Model</span><span data-tr>Güvenlik Modeli</span></p>
                             <ul style="margin:0.5rem 0 0 0; padding-left:1.2rem; font-size:0.85rem; color:#1e3a8a; line-height:1.6;">
-                                <li><span data-en>The admin password only protects this panel's UI</span><span data-tr>Yönetici şifresi sadece bu panelin arayüzünü korur</span></li>
-                                <li><span data-en><strong>Real security = Google Sheet permissions</strong></span><span data-tr><strong>Gerçek güvenlik = Google Sheet izinleri</strong></span></li>
-                                <li><span data-en>Keep your sheet <strong>private</strong> - don't share edit access publicly</span><span data-tr>Sheet'inizi <strong>gizli</strong> tutun - herkese düzenleme izni vermeyin</span></li>
-                                <li><span data-en>The embedded editor requires Google login with edit permission</span><span data-tr>Gömülü düzenleyici, düzenleme yetkisi olan Google girişi gerektirir</span></li>
+                                <li><span data-en><strong>Hidden access:</strong> This panel is not visible on the site</span><span data-tr><strong>Gizli erişim:</strong> Bu panel sitede görünmez</span></li>
+                                <li><span data-en><strong>Access via:</strong> <code style="background:#bfdbfe;padding:2px 6px;border-radius:4px;">#admin</code> in URL or <code style="background:#bfdbfe;padding:2px 6px;border-radius:4px;">Ctrl+Shift+A</code></span><span data-tr><strong>Erişim:</strong> URL'de <code style="background:#bfdbfe;padding:2px 6px;border-radius:4px;">#admin</code> veya <code style="background:#bfdbfe;padding:2px 6px;border-radius:4px;">Ctrl+Shift+A</code></span></li>
+                                <li><span data-en><strong>Real security:</strong> Google Sheet edit permissions</span><span data-tr><strong>Gerçek güvenlik:</strong> Google Sheet düzenleme izinleri</span></li>
                             </ul>
                         </div>
                         
@@ -5090,14 +5071,6 @@
                             <label><span data-en>Google Sheet ID</span><span data-tr>Google Sheet ID</span></label>
                             <input type="text" id="settingSheetId" class="admin-input" style="width:100%;">
                             <p class="admin-hint"><span data-en>Found in the sheet URL after /d/</span><span data-tr>Sheet URL'sinde /d/ sonrasında bulunur</span></p>
-                        </div>
-                        
-                        <div class="settings-group" style="background:#fef3c7; padding:1rem; border-radius:8px; border-left:4px solid #f59e0b;">
-                            <p style="margin:0; font-weight:600; color:#92400e;"><i class="fa-solid fa-lock"></i> 
-                            <span data-en>Admin Password</span><span data-tr>Yönetici Şifresi</span></p>
-                            <p style="margin:0.5rem 0 0 0; font-size:0.85rem; color:#78350f;">
-                            <span data-en>To change the password, edit your Google Sheet's <strong>Settings</strong> tab → row with key <code style="background:#fef9c3;padding:2px 6px;border-radius:4px;">admin_password</code>. Only users with sheet edit access can change it.</span>
-                            <span data-tr>Şifreyi değiştirmek için Google Sheet'inizin <strong>Settings</strong> sekmesinde <code style="background:#fef9c3;padding:2px 6px;border-radius:4px;">admin_password</code> satırını düzenleyin. Sadece sheet düzenleme yetkisi olanlar değiştirebilir.</span></p>
                         </div>
                         
                         <button class="btn btn-accent" onclick="saveAdminSettings()">
@@ -5280,48 +5253,10 @@
             return hash.toString(36);
         }
         
-        // Config stored in localStorage
-        // Password can be set in Google Sheet Settings tab with key: admin_password
-        // If not set in sheet, falls back to localStorage, then to default
+        // Admin config - no password needed, security via Google permissions
         const ADMIN_CONFIG = {
-            passwordHash: localStorage.getItem('adminPasswordHash') || null,
-            sheetPasswordHash: null, // Will be set after loading settings
             sheetId: localStorage.getItem('sheetId') || GOOGLE_SHEET_ID
         };
-        
-        // Check password against both sheet password and local password
-        async function verifyPassword(pwd) {
-            const pwdHash = await secureHash(pwd);
-            
-            // First check: Sheet password (if configured)
-            if (ADMIN_CONFIG.sheetPasswordHash) {
-                if (pwdHash === ADMIN_CONFIG.sheetPasswordHash) return true;
-            }
-            
-            // Second check: Local password
-            if (ADMIN_CONFIG.passwordHash) {
-                // Check new secure hash
-                if (pwdHash === ADMIN_CONFIG.passwordHash) return true;
-                // Backward compatibility: check old simple hash
-                if (simpleHash(pwd) === ADMIN_CONFIG.passwordHash) {
-                    // Migrate to secure hash
-                    localStorage.setItem('adminPasswordHash', pwdHash);
-                    ADMIN_CONFIG.passwordHash = pwdHash;
-                    return true;
-                }
-            }
-            
-            // Default password check (only if no password is configured anywhere)
-            if (!ADMIN_CONFIG.sheetPasswordHash && !ADMIN_CONFIG.passwordHash) {
-                const defaultHash = await secureHash('admin123');
-                if (pwdHash === defaultHash) {
-                    console.warn('âš ï¸ Using default password. Please change it in Settings or Google Sheet!');
-                    return true;
-                }
-            }
-            
-            return false;
-        }
         
         // Toggle sidebar data panel
         function toggleDataPanel() {
@@ -5353,35 +5288,42 @@
             }
         }
         
-        function openAdminLogin() {
+        // Open admin panel (hidden access - no password)
+        function openAdminPanel() {
             document.getElementById('adminModal').classList.add('show');
-            document.getElementById('adminPassword').focus();
             document.getElementById('settingSheetId').value = ADMIN_CONFIG.sheetId;
+            
+            // Load embedded sheet directly
+            const sheetUrl = `https://docs.google.com/spreadsheets/d/${ADMIN_CONFIG.sheetId}/edit?usp=sharing&rm=embedded`;
+            document.getElementById('sheetEmbed').src = sheetUrl;
+            document.getElementById('openSheetLink').href = `https://docs.google.com/spreadsheets/d/${ADMIN_CONFIG.sheetId}/edit`;
         }
         
         function closeAdminModal() {
             document.getElementById('adminModal').classList.remove('show');
-            document.getElementById('loginError').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-        }
-        
-        async function checkAdminLogin() {
-            const pwd = document.getElementById('adminPassword').value;
-            const isValid = await verifyPassword(pwd);
-            
-            if (isValid) {
-                document.getElementById('adminLoginForm').style.display = 'none';
-                document.getElementById('adminSheetEditor').style.display = 'flex';
-                
-                // Load embedded sheet
-                const sheetUrl = `https://docs.google.com/spreadsheets/d/${ADMIN_CONFIG.sheetId}/edit?usp=sharing&rm=embedded`;
-                document.getElementById('sheetEmbed').src = sheetUrl;
-                document.getElementById('openSheetLink').href = `https://docs.google.com/spreadsheets/d/${ADMIN_CONFIG.sheetId}/edit`;
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-                document.getElementById('adminPassword').value = '';
+            // Clear hash if present
+            if (window.location.hash === '#admin') {
+                history.replaceState(null, '', window.location.pathname + window.location.search);
             }
         }
+        
+        // Hidden access via URL hash (#admin) or keyboard shortcut (Ctrl+Shift+A)
+        function checkAdminAccess() {
+            if (window.location.hash === '#admin') {
+                openAdminPanel();
+            }
+        }
+        
+        // Listen for hash changes
+        window.addEventListener('hashchange', checkAdminAccess);
+        
+        // Keyboard shortcut: Ctrl+Shift+A
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                e.preventDefault();
+                openAdminPanel();
+            }
+        });
         
         function showAdminTab(tab) {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
