@@ -1,7 +1,7 @@
 <!-- Job Detail Page -->
 <div class="detail-page">
     <button onclick="Router.goTo('jobs')" class="btn btn-ghost btn-sm detail-back">
-        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Jobs</span><span data-tr>İş İlanlarına Dön</span>
+        <i class="fa-solid fa-arrow-left"></i> <span id="jobBackBtn">Back to Jobs</span>
     </button>
     
     <div class="detail-card">
@@ -15,28 +15,28 @@
                 <div class="detail-info-item">
                     <i class="fa-solid fa-building"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Company</span><span data-tr>Şirket</span></span>
+                        <span class="detail-info-label" id="jobLabelCompany">Company</span>
                         <span class="detail-info-value" id="jobDetailCompany"></span>
                     </div>
                 </div>
                 <div class="detail-info-item">
                     <i class="fa-solid fa-location-dot"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Location</span><span data-tr>Konum</span></span>
+                        <span class="detail-info-label" id="jobLabelLocation">Location</span>
                         <span class="detail-info-value" id="jobDetailLocation"></span>
                     </div>
                 </div>
                 <div class="detail-info-item" id="jobSalaryItem" style="display:none;">
                     <i class="fa-solid fa-money-bill"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Salary</span><span data-tr>Maaş</span></span>
+                        <span class="detail-info-label" id="jobLabelSalary">Salary</span>
                         <span class="detail-info-value" id="jobDetailSalary"></span>
                     </div>
                 </div>
                 <div class="detail-info-item" id="jobDeadlineItem" style="display:none;">
                     <i class="fa-solid fa-calendar-xmark"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Deadline</span><span data-tr>Son Tarih</span></span>
+                        <span class="detail-info-label" id="jobLabelDeadline">Deadline</span>
                         <span class="detail-info-value" id="jobDetailDeadline"></span>
                     </div>
                 </div>
@@ -45,13 +45,13 @@
             <div class="detail-content" id="jobDetailContent"></div>
             
             <div id="jobRequirementsBox" class="detail-tech-box" style="display:none;">
-                <h4><i class="fa-solid fa-list-check"></i> <span data-en>Requirements</span><span data-tr>Gereksinimler</span></h4>
+                <h4><i class="fa-solid fa-list-check"></i> <span id="jobLabelReq">Requirements</span></h4>
                 <div id="jobDetailRequirements"></div>
             </div>
             
             <div id="jobApplyBox" class="detail-actions" style="display:none;">
                 <a href="#" id="jobApplyLink" class="btn btn-accent" target="_blank">
-                    <i class="fa-solid fa-paper-plane"></i> <span data-en>Apply Now</span><span data-tr>Şimdi Başvur</span>
+                    <i class="fa-solid fa-paper-plane"></i> <span id="jobLabelApply">Apply Now</span>
                 </a>
             </div>
         </div>
@@ -87,6 +87,15 @@
         
         const typeClass = (j.type || '').toLowerCase().includes('intern') ? 'tag-green' : 
                           (j.type || '').toLowerCase().includes('part') ? 'tag-amber' : 'tag-accent';
+        
+        // Update labels with current language
+        document.getElementById('jobBackBtn').textContent = t('Back to Jobs', 'İş İlanlarına Dön');
+        document.getElementById('jobLabelCompany').textContent = t('Company', 'Şirket');
+        document.getElementById('jobLabelLocation').textContent = t('Location', 'Konum');
+        document.getElementById('jobLabelSalary').textContent = t('Salary', 'Maaş');
+        document.getElementById('jobLabelDeadline').textContent = t('Deadline', 'Son Tarih');
+        document.getElementById('jobLabelReq').textContent = t('Requirements', 'Gereksinimler');
+        document.getElementById('jobLabelApply').textContent = t('Apply Now', 'Şimdi Başvur');
         
         document.getElementById('jobDetailType').textContent = j.type || 'Full-Time';
         document.getElementById('jobDetailType').className = 'tag ' + typeClass;

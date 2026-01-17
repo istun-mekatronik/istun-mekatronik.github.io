@@ -1,7 +1,7 @@
 <!-- News Detail Page -->
 <div class="detail-page">
     <button onclick="Router.goTo('news')" class="btn btn-ghost btn-sm detail-back">
-        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to News</span><span data-tr>Haberlere Dön</span>
+        <i class="fa-solid fa-arrow-left"></i> <span id="newsBackBtn">Back to News</span>
     </button>
     
     <div class="detail-card">
@@ -16,7 +16,7 @@
             <div class="detail-content" id="newsDetailContent"></div>
             
             <div id="newsDetailTagsBox" class="detail-tech-box" style="display:none;">
-                <h4><i class="fa-solid fa-tags"></i> <span data-en>Tags</span><span data-tr>Etiketler</span></h4>
+                <h4><i class="fa-solid fa-tags"></i> <span id="newsLabelTags">Tags</span></h4>
                 <div id="newsDetailTags" class="detail-tech-tags"></div>
             </div>
         </div>
@@ -36,6 +36,10 @@
         const data = getData('news');
         const n = data[index];
         if (!n) return;
+        
+        // Update labels with current language
+        document.getElementById('newsBackBtn').textContent = t('Back to News', 'Haberlere Dön');
+        document.getElementById('newsLabelTags').textContent = t('Tags', 'Etiketler');
         
         document.getElementById('newsDetailCategory').textContent = n.category || 'News';
         document.getElementById('newsDetailCategory').className = 'tag ' + getTagClass(n.category);
@@ -58,5 +62,16 @@
             tagsBox.style.display = 'none';
         }
     };
+    
+    // Register render function with multiple naming conventions
+    function renderNewsDetailPage() {
+        const index = window.currentDetailIndex;
+        if (typeof index === 'number' && index >= 0) {
+            window.renderNewsDetail(index);
+        }
+    }
+    window.renderNewsDetailPage = renderNewsDetailPage;
+    window['renderNews-detailPage'] = renderNewsDetailPage;
+    window.renderNewsdetailPage = renderNewsDetailPage;
 })();
 </script>

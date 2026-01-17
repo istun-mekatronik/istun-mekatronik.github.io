@@ -1,7 +1,7 @@
 <!-- Event Detail Page -->
 <div class="detail-page">
     <button onclick="Router.goTo('news')" class="btn btn-ghost btn-sm detail-back">
-        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Events</span><span data-tr>Etkinliklere Dön</span>
+        <i class="fa-solid fa-arrow-left"></i> <span id="eventBackBtn">Back to Events</span>
     </button>
     
     <div class="detail-card">
@@ -15,21 +15,21 @@
                 <div class="detail-info-item">
                     <i class="fa-solid fa-calendar"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Date</span><span data-tr>Tarih</span></span>
+                        <span class="detail-info-label" id="eventLabelDate">Date</span>
                         <span class="detail-info-value" id="eventDetailDate"></span>
                     </div>
                 </div>
                 <div class="detail-info-item">
                     <i class="fa-solid fa-clock"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Time</span><span data-tr>Saat</span></span>
+                        <span class="detail-info-label" id="eventLabelTime">Time</span>
                         <span class="detail-info-value" id="eventDetailTime"></span>
                     </div>
                 </div>
                 <div class="detail-info-item">
                     <i class="fa-solid fa-location-dot"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Location</span><span data-tr>Konum</span></span>
+                        <span class="detail-info-label" id="eventLabelLocation">Location</span>
                         <span class="detail-info-value" id="eventDetailLocation"></span>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
             <div id="eventDetailSpeakerBox" class="detail-speaker-box" style="display:none;">
                 <i class="fa-solid fa-user-tie"></i>
                 <div>
-                    <span class="detail-info-label"><span data-en>Speaker</span><span data-tr>Konuşmacı</span></span>
+                    <span class="detail-info-label" id="eventLabelSpeaker">Speaker</span>
                     <span class="detail-info-value" id="eventDetailSpeaker"></span>
                 </div>
             </div>
@@ -47,7 +47,7 @@
             
             <div id="eventRegisterBox" class="detail-actions" style="display:none;">
                 <a href="#" id="eventRegisterLink" class="btn btn-accent" target="_blank">
-                    <i class="fa-solid fa-calendar-plus"></i> <span data-en>Register Now</span><span data-tr>Şimdi Kayıt Ol</span>
+                    <i class="fa-solid fa-calendar-plus"></i> <span id="eventLabelRegister">Register Now</span>
                 </a>
             </div>
         </div>
@@ -67,6 +67,14 @@
         const data = getData('events');
         const e = data[index];
         if (!e) return;
+        
+        // Update labels with current language
+        document.getElementById('eventBackBtn').textContent = t('Back to Events', 'Etkinliklere Dön');
+        document.getElementById('eventLabelDate').textContent = t('Date', 'Tarih');
+        document.getElementById('eventLabelTime').textContent = t('Time', 'Saat');
+        document.getElementById('eventLabelLocation').textContent = t('Location', 'Konum');
+        document.getElementById('eventLabelSpeaker').textContent = t('Speaker', 'Konuşmacı');
+        document.getElementById('eventLabelRegister').textContent = t('Register Now', 'Şimdi Kayıt Ol');
         
         document.getElementById('eventDetailType').textContent = e.type || 'Event';
         document.getElementById('eventDetailType').className = 'tag ' + getTagClass(e.type);
@@ -96,5 +104,16 @@
             registerBox.style.display = 'none';
         }
     };
+    
+    // Register render function with multiple naming conventions
+    function renderEventDetailPage() {
+        const index = window.currentDetailIndex;
+        if (typeof index === 'number' && index >= 0) {
+            window.renderEventDetail(index);
+        }
+    }
+    window.renderEventDetailPage = renderEventDetailPage;
+    window['renderEvent-detailPage'] = renderEventDetailPage;
+    window.renderEventdetailPage = renderEventDetailPage;
 })();
 </script>

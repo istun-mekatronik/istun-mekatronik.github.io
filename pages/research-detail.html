@@ -1,7 +1,7 @@
 <!-- Research Detail Page -->
 <div class="detail-page">
     <button onclick="Router.goTo('research')" class="btn btn-ghost btn-sm detail-back">
-        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Research</span><span data-tr>Araştırmaya Dön</span>
+        <i class="fa-solid fa-arrow-left"></i> <span id="researchBackBtn">Back to Research</span>
     </button>
     
     <div class="detail-card">
@@ -17,14 +17,14 @@
                 <div class="detail-info-item">
                     <i class="fa-solid fa-user-tie"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Lead Researcher</span><span data-tr>Araştırma Lideri</span></span>
+                        <span class="detail-info-label" id="researchLabelLead">Lead Researcher</span>
                         <span class="detail-info-value" id="researchDetailLead"></span>
                     </div>
                 </div>
                 <div class="detail-info-item">
                     <i class="fa-solid fa-users"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Team Size</span><span data-tr>Ekip Büyüklüğü</span></span>
+                        <span class="detail-info-label" id="researchLabelTeam">Team Size</span>
                         <span class="detail-info-value" id="researchDetailMembers"></span>
                     </div>
                 </div>
@@ -33,17 +33,17 @@
             <div class="detail-content" id="researchDetailContent"></div>
             
             <div class="detail-equipment-box" id="researchPublicationsBox" style="display:none;">
-                <h4><i class="fa-solid fa-book"></i> <span data-en>Key Publications</span><span data-tr>Önemli Yayınlar</span></h4>
+                <h4><i class="fa-solid fa-book"></i> <span id="researchLabelPubs">Key Publications</span></h4>
                 <p id="researchDetailPublications"></p>
             </div>
             
             <div class="detail-equipment-box" id="researchProjectsBox" style="display:none;background:linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);border-left:4px solid var(--purple);">
-                <h4 style="color:var(--purple);"><i class="fa-solid fa-flask"></i> <span data-en>Active Projects</span><span data-tr>Aktif Projeler</span></h4>
+                <h4 style="color:var(--purple);"><i class="fa-solid fa-flask"></i> <span id="researchLabelProjects">Active Projects</span></h4>
                 <p id="researchDetailProjects"></p>
             </div>
             
             <div class="detail-equipment-box" id="researchEquipmentBox" style="display:none;">
-                <h4><i class="fa-solid fa-wrench"></i> <span data-en>Equipment & Tools</span><span data-tr>Ekipman ve Araçlar</span></h4>
+                <h4><i class="fa-solid fa-wrench"></i> <span id="researchLabelEquip">Equipment & Tools</span></h4>
                 <p id="researchDetailEquipment"></p>
             </div>
         </div>
@@ -64,6 +64,14 @@
         
         const r = data[index];
         if (!r) return;
+        
+        // Update labels with current language
+        document.getElementById('researchBackBtn').textContent = t('Back to Research', 'Araştırmaya Dön');
+        document.getElementById('researchLabelLead').textContent = t('Lead Researcher', 'Araştırma Lideri');
+        document.getElementById('researchLabelTeam').textContent = t('Team Size', 'Ekip Büyüklüğü');
+        document.getElementById('researchLabelPubs').textContent = t('Key Publications', 'Önemli Yayınlar');
+        document.getElementById('researchLabelProjects').textContent = t('Active Projects', 'Aktif Projeler');
+        document.getElementById('researchLabelEquip').textContent = t('Equipment & Tools', 'Ekipman ve Araçlar');
         
         document.getElementById('researchDetailTitle').textContent = t(r.name_en, r.name_tr);
         document.getElementById('researchDetailFocus').textContent = r.focus || '';

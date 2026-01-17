@@ -22,6 +22,25 @@ const I18n = {
         // Re-render pages if data is loaded
         if (rerender && DataManager.data.settings) {
             App.renderAll();
+            
+            // Also re-render current detail page if one is open
+            if (typeof window.currentDetailIndex === 'number' && window.currentDetailIndex >= 0) {
+                const pageId = Router.currentPage;
+                if (pageId && pageId.includes('-detail')) {
+                    // Try to find and call the render function
+                    const funcNames = [
+                        'render' + pageId.replace(/-/g, '') + 'Page',
+                        'render' + pageId.charAt(0).toUpperCase() + pageId.slice(1).replace(/-/g, '') + 'Page',
+                        'render' + pageId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') + 'Page'
+                    ];
+                    for (const name of funcNames) {
+                        if (typeof window[name] === 'function') {
+                            window[name]();
+                            break;
+                        }
+                    }
+                }
+            }
         }
     },
     

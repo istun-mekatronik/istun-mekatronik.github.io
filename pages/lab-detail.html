@@ -1,7 +1,7 @@
 <!-- Lab Detail Page -->
 <div class="detail-page">
     <button onclick="Router.goTo('labs')" class="btn btn-ghost btn-sm detail-back">
-        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Labs</span><span data-tr>Lablara Dön</span>
+        <i class="fa-solid fa-arrow-left"></i> <span id="labBackBtn">Back to Labs</span>
     </button>
     
     <div class="detail-card">
@@ -16,14 +16,14 @@
                 <div class="detail-info-item">
                     <i class="fa-solid fa-door-open"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Room</span><span data-tr>Oda</span></span>
+                        <span class="detail-info-label" id="labLabelRoom">Room</span>
                         <span class="detail-info-value" id="labDetailRoom"></span>
                     </div>
                 </div>
                 <div class="detail-info-item">
                     <i class="fa-solid fa-user-tie"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Manager</span><span data-tr>Yönetici</span></span>
+                        <span class="detail-info-label" id="labLabelManager">Manager</span>
                         <span class="detail-info-value" id="labDetailManager"></span>
                     </div>
                 </div>
@@ -32,7 +32,7 @@
             <div class="detail-content" id="labDetailContent"></div>
             
             <div class="detail-equipment-box">
-                <h4><i class="fa-solid fa-wrench"></i> <span data-en>Equipment</span><span data-tr>Ekipman</span></h4>
+                <h4><i class="fa-solid fa-wrench"></i> <span id="labLabelEquipment">Equipment</span></h4>
                 <p id="labDetailEquipment"></p>
             </div>
         </div>
@@ -57,6 +57,12 @@
             console.error('Lab not found at index:', index);
             return;
         }
+        
+        // Update labels with current language
+        document.getElementById('labBackBtn').textContent = t('Back to Labs', 'Lablara Dön');
+        document.getElementById('labLabelRoom').textContent = t('Room', 'Oda');
+        document.getElementById('labLabelManager').textContent = t('Manager', 'Yönetici');
+        document.getElementById('labLabelEquipment').textContent = t('Equipment', 'Ekipman');
         
         const typeClass = (l.type || '').toLowerCase() === 'research' ? 'tag-green' : 'tag-accent';
         
