@@ -1700,11 +1700,11 @@ main {
 .admin-modal {
     background: #ffffff;
     border-radius: 12px;
-    width: 800px;
-    min-width: 400px;
+    width: 900px;
+    min-width: 500px;
     max-width: 95vw;
-    height: 600px;
-    min-height: 300px;
+    height: 700px;
+    min-height: 400px;
     max-height: 90vh;
     overflow: hidden;
     box-shadow: 0 25px 80px rgba(0,0,0,0.3);
@@ -1726,7 +1726,15 @@ main {
 }
 
 .admin-modal-header h3 { margin: 0; font-size: 1.1rem; color: #0c1220; }
-.admin-modal-body { flex: 1; overflow-y: auto; background: #ffffff; }
+
+.admin-modal-body { 
+    flex: 1; 
+    overflow: hidden; 
+    background: #ffffff; 
+    display: flex;
+    flex-direction: column;
+}
+
 .admin-section { padding: 1.25rem; }
 .admin-desc { color: #475569; margin: 0 0 1rem 0; font-size: 0.9rem; }
 .admin-input-group { display: flex; gap: 0.5rem; }
@@ -1754,6 +1762,7 @@ main {
     padding: 0 1.25rem;
     border-bottom: 1px solid #e2e0dc;
     background: #faf8f5;
+    flex-shrink: 0;
 }
 
 .admin-tab {
@@ -1769,19 +1778,39 @@ main {
 
 .admin-tab:hover { color: #0c1220; }
 .admin-tab.active { color: #6366f1; border-bottom-color: #6366f1; }
-.admin-tab-content { padding: 1.25rem; background: #ffffff; }
 
+.admin-tab-content { 
+    padding: 1.25rem; 
+    background: #ffffff; 
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* FIXED: Sheet embed container now fills available space */
 .sheet-embed-container {
     background: #faf8f5;
     border-radius: 8px;
     padding: 0.5rem;
     margin-bottom: 1rem;
     border: 1px solid #e2e0dc;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 450px;
 }
 
-.sheet-embed-container iframe { min-height: 350px; height: calc(100% - 10px); }
+.sheet-embed-container iframe { 
+    flex: 1;
+    min-height: 420px; 
+    height: 100%;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+}
 
-.admin-actions { display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap; }
+.admin-actions { display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap; flex-shrink: 0; }
 
 .settings-group { margin-bottom: 1rem; }
 .settings-group label { display: block; font-weight: 500; margin-bottom: 0.4rem; font-size: 0.9rem; color: #0c1220; }
@@ -1864,4 +1893,10 @@ html[lang="tr"] [data-tr].grid { display: grid; }
     .hero-actions { flex-direction: column; }
     .card-grid { grid-template-columns: 1fr; }
     .faculty-grid { grid-template-columns: repeat(2, 1fr); }
+    
+    .admin-modal {
+        width: 95vw;
+        height: 85vh;
+        min-width: 300px;
+    }
 }
