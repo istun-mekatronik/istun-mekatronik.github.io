@@ -1155,6 +1155,9 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            min-height: 220px;
         }
 
         .faculty-card:hover {
@@ -1188,6 +1191,10 @@
             font-size: 0.65rem;
             color: var(--accent);
             font-weight: 500;
+        }
+        
+        .faculty-links-spacer {
+            flex-grow: 1;
         }
 
         .faculty-links {
@@ -3882,10 +3889,12 @@
                 <h3 class="faculty-name">${f.name}</h3>
                 <p class="faculty-title">${f.title}</p>
                 <div class="faculty-field">${t(f.research_en, f.research_tr)}</div>
+                <div class="faculty-links-spacer"></div>
                 <div class="faculty-links">
                     ${f.email ? `<a href="mailto:${f.email}" title="Email" onclick="event.stopPropagation()"><i class="fa-solid fa-envelope"></i></a>` : ''}
-                    ${f.scholar ? `<a href="${f.scholar}" title="Scholar" onclick="event.stopPropagation()"><i class="fa-brands fa-google-scholar"></i></a>` : ''}
-                    ${f.github ? `<a href="${f.github}" title="GitHub" onclick="event.stopPropagation()"><i class="fa-brands fa-github"></i></a>` : ''}
+                    ${f.yok_cv ? `<a href="${f.yok_cv}" target="_blank" title="${t('CoHE Academic CV', 'YÖK Akademik CV')}" onclick="event.stopPropagation()"><i class="fa-solid fa-graduation-cap"></i></a>` : ''}
+                    ${f.scholar ? `<a href="${f.scholar}" target="_blank" title="Google Scholar" onclick="event.stopPropagation()"><i class="fa-brands fa-google-scholar"></i></a>` : ''}
+                    ${f.github ? `<a href="${f.github}" target="_blank" title="GitHub" onclick="event.stopPropagation()"><i class="fa-brands fa-github"></i></a>` : ''}
                 </div>
             </div>
         `).join('');
@@ -3944,11 +3953,11 @@
             // Links
             const linksHTML = [];
             if (f.email) linksHTML.push(`<a href="mailto:${f.email}" class="profile-contact-link"><i class="fa-solid fa-envelope"></i> <span>${f.email}</span></a>`);
-            if (f.yok_cv) linksHTML.push(`<a href="${f.yok_cv}" target="_blank" class="profile-contact-link"><i class="fa-solid fa-graduation-cap"></i> <span>YÖK Akademik CV</span></a>`);
+            if (f.yok_cv) linksHTML.push(`<a href="${f.yok_cv}" target="_blank" class="profile-contact-link"><i class="fa-solid fa-graduation-cap"></i> <span>${t('CoHE Academic CV', 'YÖK Akademik CV')}</span></a>`);
             if (f.scholar) linksHTML.push(`<a href="${f.scholar}" target="_blank" class="profile-contact-link"><i class="fa-brands fa-google-scholar"></i> <span>Google Scholar</span></a>`);
-            if (f.github) linksHTML.push(`<a href="${f.github}" target="_blank" class="profile-contact-link"><i class="fa-brands fa-github"></i> <span>GitHub Profile</span></a>`);
+            if (f.github) linksHTML.push(`<a href="${f.github}" target="_blank" class="profile-contact-link"><i class="fa-brands fa-github"></i> <span>GitHub</span></a>`);
 
-            document.getElementById('profLinks').innerHTML = linksHTML.join('') || '<p class="text-muted">No links available</p>';
+            document.getElementById('profLinks').innerHTML = linksHTML.join('') || `<p class="text-muted">${t('No links available', 'Link bulunamadı')}</p>`;
         }
 
         function renderPublications() {
