@@ -1,53 +1,53 @@
 <!-- Event Detail Page -->
 <div class="detail-page">
     <button onclick="Router.goTo('news')" class="btn btn-ghost btn-sm detail-back">
-        <i class="fa-solid fa-arrow-left"></i> <span id="eventBackBtn">Back to Events</span>
+        <i class="fa-solid fa-arrow-left"></i> <span id="eventPageBackBtn">Back to Events</span>
     </button>
     
     <div class="detail-card">
         <div class="detail-body">
             <div class="detail-meta">
-                <span class="tag" id="eventDetailType">Event</span>
+                <span class="tag" id="eventPageType">Event</span>
             </div>
-            <h1 class="detail-title" id="eventDetailTitle">Loading...</h1>
+            <h1 class="detail-title" id="eventPageTitle">Loading...</h1>
             
             <div class="detail-info-grid">
                 <div class="detail-info-item">
                     <i class="fa-solid fa-calendar"></i>
                     <div>
-                        <span class="detail-info-label" id="eventLabelDate">Date</span>
-                        <span class="detail-info-value" id="eventDetailDate"></span>
+                        <span class="detail-info-label" id="eventPageLabelDate">Date</span>
+                        <span class="detail-info-value" id="eventPageDate"></span>
                     </div>
                 </div>
                 <div class="detail-info-item">
                     <i class="fa-solid fa-clock"></i>
                     <div>
-                        <span class="detail-info-label" id="eventLabelTime">Time</span>
-                        <span class="detail-info-value" id="eventDetailTime"></span>
+                        <span class="detail-info-label" id="eventPageLabelTime">Time</span>
+                        <span class="detail-info-value" id="eventPageTime"></span>
                     </div>
                 </div>
                 <div class="detail-info-item">
                     <i class="fa-solid fa-location-dot"></i>
                     <div>
-                        <span class="detail-info-label" id="eventLabelLocation">Location</span>
-                        <span class="detail-info-value" id="eventDetailLocation"></span>
+                        <span class="detail-info-label" id="eventPageLabelLocation">Location</span>
+                        <span class="detail-info-value" id="eventPageLocation"></span>
                     </div>
                 </div>
             </div>
             
-            <div id="eventDetailSpeakerBox" class="detail-speaker-box" style="display:none;">
+            <div id="eventPageSpeakerBox" class="detail-speaker-box" style="display:none;">
                 <i class="fa-solid fa-user-tie"></i>
                 <div>
-                    <span class="detail-info-label" id="eventLabelSpeaker">Speaker</span>
-                    <span class="detail-info-value" id="eventDetailSpeaker"></span>
+                    <span class="detail-info-label" id="eventPageLabelSpeaker">Speaker</span>
+                    <span class="detail-info-value" id="eventPageSpeaker"></span>
                 </div>
             </div>
             
-            <div class="detail-content" id="eventDetailContent"></div>
+            <div class="detail-content" id="eventPageContent"></div>
             
-            <div id="eventRegisterBox" class="detail-actions" style="display:none;">
-                <a href="#" id="eventRegisterLink" class="btn btn-accent" target="_blank">
-                    <i class="fa-solid fa-calendar-plus"></i> <span id="eventLabelRegister">Register Now</span>
+            <div id="eventPageRegisterBox" class="detail-actions" style="display:none;">
+                <a href="#" id="eventPageRegisterLink" class="btn btn-accent" target="_blank">
+                    <i class="fa-solid fa-calendar-plus"></i> <span id="eventPageLabelRegister">Register Now</span>
                 </a>
             </div>
         </div>
@@ -60,52 +60,11 @@
         window.currentDetailPage = 'event';
         window.currentDetailIndex = index;
         Router.goTo('event-detail');
-        setTimeout(() => renderEventDetail(index), 50);
+        setTimeout(function() {
+            renderEventDetailPage();
+        }, 100);
     };
     
-    window.renderEventDetail = function(index) {
-        const data = getData('events');
-        const e = data[index];
-        if (!e) return;
-        
-        // Update labels with current language
-        document.getElementById('eventBackBtn').textContent = t('Back to Events', 'Etkinliklere Dön');
-        document.getElementById('eventLabelDate').textContent = t('Date', 'Tarih');
-        document.getElementById('eventLabelTime').textContent = t('Time', 'Saat');
-        document.getElementById('eventLabelLocation').textContent = t('Location', 'Konum');
-        document.getElementById('eventLabelSpeaker').textContent = t('Speaker', 'Konuşmacı');
-        document.getElementById('eventLabelRegister').textContent = t('Register Now', 'Şimdi Kayıt Ol');
-        
-        document.getElementById('eventDetailType').textContent = e.type || 'Event';
-        document.getElementById('eventDetailType').className = 'tag ' + getTagClass(e.type);
-        document.getElementById('eventDetailTitle').textContent = t(e.title_en, e.title_tr);
-        document.getElementById('eventDetailDate').textContent = e.date || '—';
-        document.getElementById('eventDetailTime').textContent = e.time || '—';
-        document.getElementById('eventDetailLocation').textContent = e.location || '—';
-        
-        const content = t(e.content_en, e.content_tr) || t(e.description_en, e.description_tr) || '';
-        document.getElementById('eventDetailContent').innerHTML = content.replace(/\n/g, '<br>');
-        
-        // Speaker
-        const speakerBox = document.getElementById('eventDetailSpeakerBox');
-        if (e.speaker) {
-            speakerBox.style.display = 'flex';
-            document.getElementById('eventDetailSpeaker').textContent = e.speaker;
-        } else {
-            speakerBox.style.display = 'none';
-        }
-        
-        // Registration link
-        const registerBox = document.getElementById('eventRegisterBox');
-        if (e.registration_link) {
-            registerBox.style.display = 'block';
-            document.getElementById('eventRegisterLink').href = e.registration_link;
-        } else {
-            registerBox.style.display = 'none';
-        }
-    };
-    
-    // Register render function with multiple naming conventions
     function renderEventDetailPage() {
         const index = window.currentDetailIndex;
         console.log('renderEventDetailPage called, index:', index);
@@ -115,22 +74,104 @@
             return;
         }
         
-        const data = getData('events');
-        if (!data || data.length === 0) {
+        const allData = DataManager.data;
+        if (!allData || !allData.events || allData.events.length === 0) {
             console.warn('Events data not loaded yet, retrying...');
-            setTimeout(renderEventDetailPage, 100);
+            setTimeout(renderEventDetailPage, 150);
             return;
         }
         
-        window.renderEventDetail(index);
+        const e = allData.events[index];
+        if (!e) {
+            console.error('Event not found at index:', index);
+            return;
+        }
+        
+        console.log('Rendering event:', e);
+        
+        // Update labels with current language (using unique eventPage* IDs)
+        const backBtn = document.getElementById('eventPageBackBtn');
+        const labelDate = document.getElementById('eventPageLabelDate');
+        const labelTime = document.getElementById('eventPageLabelTime');
+        const labelLocation = document.getElementById('eventPageLabelLocation');
+        const labelSpeaker = document.getElementById('eventPageLabelSpeaker');
+        const labelRegister = document.getElementById('eventPageLabelRegister');
+        
+        if (backBtn) backBtn.textContent = t('Back to Events', 'Etkinliklere Dön');
+        if (labelDate) labelDate.textContent = t('Date', 'Tarih');
+        if (labelTime) labelTime.textContent = t('Time', 'Saat');
+        if (labelLocation) labelLocation.textContent = t('Location', 'Konum');
+        if (labelSpeaker) labelSpeaker.textContent = t('Speaker', 'Konuşmacı');
+        if (labelRegister) labelRegister.textContent = t('Register Now', 'Şimdi Kayıt Ol');
+        
+        // Set content (using unique eventPage* IDs)
+        const typeEl = document.getElementById('eventPageType');
+        const titleEl = document.getElementById('eventPageTitle');
+        const dateEl = document.getElementById('eventPageDate');
+        const timeEl = document.getElementById('eventPageTime');
+        const locationEl = document.getElementById('eventPageLocation');
+        const contentEl = document.getElementById('eventPageContent');
+        const speakerBox = document.getElementById('eventPageSpeakerBox');
+        const speakerEl = document.getElementById('eventPageSpeaker');
+        const registerBox = document.getElementById('eventPageRegisterBox');
+        const registerLink = document.getElementById('eventPageRegisterLink');
+        
+        if (typeEl) {
+            typeEl.textContent = e.type || 'Event';
+            typeEl.className = 'tag ' + (typeof getTagClass === 'function' ? getTagClass(e.type) : '');
+        }
+        
+        if (titleEl) {
+            const title = t(e.title_en, e.title_tr) || e.title || 'Event';
+            titleEl.textContent = title;
+        }
+        
+        if (dateEl) dateEl.textContent = e.date || '—';
+        if (timeEl) timeEl.textContent = e.time || '—';
+        if (locationEl) locationEl.textContent = e.location || '—';
+        
+        if (contentEl) {
+            const content = t(e.content_en, e.content_tr) || t(e.description_en, e.description_tr) || '';
+            contentEl.innerHTML = content.replace(/\n/g, '<br>');
+        }
+        
+        // Speaker
+        if (speakerBox && speakerEl) {
+            if (e.speaker) {
+                speakerBox.style.display = 'flex';
+                speakerEl.textContent = e.speaker;
+            } else {
+                speakerBox.style.display = 'none';
+            }
+        }
+        
+        // Registration link
+        if (registerBox && registerLink) {
+            if (e.registration_link) {
+                registerBox.style.display = 'block';
+                registerLink.href = e.registration_link;
+            } else {
+                registerBox.style.display = 'none';
+            }
+        }
     }
+    
+    // Also expose as renderEventDetail for compatibility
+    window.renderEventDetail = function(index) {
+        window.currentDetailIndex = index;
+        renderEventDetailPage();
+    };
+    
+    // Register render function with multiple naming conventions
     window.renderEventDetailPage = renderEventDetailPage;
     window['renderEvent-detailPage'] = renderEventDetailPage;
     window.renderEventdetailPage = renderEventDetailPage;
     
     // Auto-render on page load if index is set
-    if (typeof window.currentDetailIndex === 'number') {
-        setTimeout(renderEventDetailPage, 50);
-    }
+    setTimeout(function() {
+        if (typeof window.currentDetailIndex === 'number' && window.currentDetailIndex >= 0) {
+            renderEventDetailPage();
+        }
+    }, 100);
 })();
 </script>

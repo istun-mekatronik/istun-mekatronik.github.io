@@ -236,14 +236,25 @@ function renderHomePage() {
 
 // Navigate to event detail from home page
 window.openHomeEventDetail = function(index) {
+    console.log('openHomeEventDetail called with index:', index);
+    window.currentDetailPage = 'event';
     window.currentDetailIndex = index;
     Router.goTo('event-detail');
-    setTimeout(() => {
-        if (typeof window.renderEventDetailPage === 'function') {
-            window.renderEventDetailPage();
-        } else if (typeof window.renderEventDetail === 'function') {
-            window.renderEventDetail(index);
-        }
-    }, 100);
+    
+    // Try to render multiple times to ensure page is loaded
+    function tryRender(attempts) {
+        if (attempts <= 0) return;
+        
+        setTimeout(function() {
+            if (typeof window.renderEventDetailPage === 'function') {
+                console.log('Calling renderEventDetailPage');
+                window.renderEventDetailPage();
+            } else {
+                console.log('renderEventDetailPage not ready, retrying...');
+                tryRender(attempts - 1);
+            }
+        }, 150);
+    }
+    tryRender(5);
 };
 </script>
