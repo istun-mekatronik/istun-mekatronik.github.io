@@ -2174,6 +2174,37 @@
                 margin: 0 auto;
             }
         }
+        
+        /* Profile Related Content */
+        .profile-related-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .profile-related-item {
+            padding: 0.75rem 1rem;
+            background: var(--bg-warm);
+            border-radius: var(--radius);
+            border-left: 3px solid var(--accent);
+        }
+        
+        .profile-related-item h4 {
+            font-size: 0.9rem;
+            margin: 0 0 0.25rem 0;
+            color: var(--text-main);
+        }
+        
+        .profile-related-item p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        
+        .profile-related-item .tag {
+            font-size: 0.65rem;
+            margin-right: 0.5rem;
+        }
 
         .card-clickable {
             cursor: pointer;
@@ -2683,6 +2714,31 @@
                         <div id="profHonorsSection">
                             <h2><span data-en>Honors & Awards</span><span data-tr>Ödüller</span></h2>
                             <p id="profHonors" class="profile-bio">...</p>
+                        </div>
+                        
+                        <div id="profPublicationsSection" style="display:none;">
+                            <h2><span data-en>Publications</span><span data-tr>Yayınlar</span></h2>
+                            <div id="profPublications" class="profile-related-list"></div>
+                        </div>
+                        
+                        <div id="profCoursesSection" style="display:none;">
+                            <h2><span data-en>Courses Taught</span><span data-tr>Verilen Dersler</span></h2>
+                            <div id="profCourses" class="profile-related-list"></div>
+                        </div>
+                        
+                        <div id="profResearchSection" style="display:none;">
+                            <h2><span data-en>Research Groups</span><span data-tr>Araştırma Grupları</span></h2>
+                            <div id="profResearchGroups" class="profile-related-list"></div>
+                        </div>
+                        
+                        <div id="profStudentsSection" style="display:none;">
+                            <h2><span data-en>Students Advised</span><span data-tr>Danışmanlık Yapılan Öğrenciler</span></h2>
+                            <div id="profStudents" class="profile-related-list"></div>
+                        </div>
+                        
+                        <div id="profProjectsSection" style="display:none;">
+                            <h2><span data-en>Projects</span><span data-tr>Projeler</span></h2>
+                            <div id="profProjects" class="profile-related-list"></div>
                         </div>
                     </main>
                 </div>
@@ -3901,7 +3957,10 @@
             document.getElementById('facultyGrid').innerHTML = html || `<p>${t('No faculty data.', 'Akademisyen verisi yok.')}</p>`;
         }
 
+        let currentProfileName = null;
+        
         function goToProfile(name) {
+            currentProfileName = name;
             renderProfile(name);
             goTo('profile');
         }
@@ -3958,6 +4017,94 @@
             if (f.github) linksHTML.push(`<a href="${f.github}" target="_blank" class="profile-contact-link"><i class="fa-brands fa-github"></i> <span>GitHub</span></a>`);
 
             document.getElementById('profLinks').innerHTML = linksHTML.join('') || `<p class="text-muted">${t('No links available', 'Link bulunamadı')}</p>`;
+            
+            // ========== RELATED CONTENT ==========
+            const facultyName = f.name || '';
+            const facultyNameLower = facultyName.toLowerCase();
+            
+            // Helper to check if name matches
+            const nameMatches = (str) => {
+                if (!str) return false;
+                const strLower = str.toLowerCase();
+                // Match full name or last name
+                const nameParts = facultyName.split(' ');
+                const lastName = nameParts[nameParts.length - 1].toLowerCase();
+                return strLower.includes(facultyNameLower) || strLower.includes(lastName);
+            };
+            
+            // Publications by this faculty
+            const relatedPubs = DATA.publications.filter(p => nameMatches(p.authors));
+            if (relatedPubs.length > 0) {
+                document.getElementById('profPublicationsSection').style.display = 'block';
+                document.getElementById('profPublications').innerHTML = relatedPubs.slice(0, 5).map(p => `
+                    <div class="profile-related-item">
+                        <h4>${p.title}</h4>
+                        <p>${p.journal}, ${p.year}${p.citations ? ` • ${p.citations} citations` : ''}</p>
+                    </div>
+                `).join('') + (relatedPubs.length > 5 ? `<p style="color:var(--text-muted);font-size:0.85rem;">+ ${relatedPubs.length - 5} ${t('more publications', 'daha fazla yayın')}</p>` : '');
+            } else {
+                document.getElementById('profPublicationsSection').style.display = 'none';
+            }
+            
+            // Courses taught by this faculty
+            const relatedCourses = DATA.courses.filter(c => nameMatches(c.instructor));
+            if (relatedCourses.length > 0) {
+                document.getElementById('profCoursesSection').style.display = 'block';
+                document.getElementById('profCourses').innerHTML = relatedCourses.map(c => `
+                    <div class="profile-related-item">
+                        <span class="tag tag-accent">${c.code}</span>
+                        <h4>${t(c.name_en, c.name_tr)}</h4>
+                        <p>${c.ects} ECTS • ${t(c.description_en, c.description_tr) || ''}</p>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('profCoursesSection').style.display = 'none';
+            }
+            
+            // Research groups led by this faculty
+            const relatedResearch = DATA.research.filter(r => nameMatches(r.lead));
+            if (relatedResearch.length > 0) {
+                document.getElementById('profResearchSection').style.display = 'block';
+                document.getElementById('profResearchGroups').innerHTML = relatedResearch.map(r => `
+                    <div class="profile-related-item card-clickable" onclick="goToResearchDetail(${DATA.research.indexOf(r)})" style="cursor:pointer;">
+                        <span class="tag tag-green">${r.type || 'Research'}</span>
+                        <h4>${t(r.name_en, r.name_tr)}</h4>
+                        <p>${r.focus || t(r.description_en, r.description_tr)}</p>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('profResearchSection').style.display = 'none';
+            }
+            
+            // Students advised by this faculty
+            const relatedStudents = DATA.students.filter(s => nameMatches(s.advisor));
+            if (relatedStudents.length > 0) {
+                document.getElementById('profStudentsSection').style.display = 'block';
+                document.getElementById('profStudents').innerHTML = relatedStudents.map(s => `
+                    <div class="profile-related-item">
+                        <span class="tag ${s.program?.toLowerCase() === 'phd' ? 'tag-accent' : 'tag-green'}">${s.program}</span>
+                        <h4>${s.name}</h4>
+                        <p>${s.research || ''}</p>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('profStudentsSection').style.display = 'none';
+            }
+            
+            // Projects advised/led by this faculty
+            const relatedProjects = DATA.projects.filter(p => nameMatches(p.advisor) || nameMatches(p.team));
+            if (relatedProjects.length > 0) {
+                document.getElementById('profProjectsSection').style.display = 'block';
+                document.getElementById('profProjects').innerHTML = relatedProjects.slice(0, 5).map(p => `
+                    <div class="profile-related-item card-clickable" onclick="goToProjectDetail(${DATA.projects.indexOf(p)})" style="cursor:pointer;">
+                        <span class="tag ${getTagClass(p.category)}">${p.category || 'Project'}</span>
+                        <h4>${t(p.title_en, p.title_tr)}</h4>
+                        <p>${p.year} • ${t(p.description_en, p.description_tr)?.substring(0, 100) || ''}...</p>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('profProjectsSection').style.display = 'none';
+            }
         }
 
         function renderPublications() {
@@ -4310,6 +4457,11 @@
         
         // Refresh current detail page when language changes
         function refreshCurrentDetailPage() {
+            // Refresh profile page if open
+            if (currentProfileName) {
+                renderProfile(currentProfileName);
+            }
+            
             if (currentDetailPage === null || currentDetailIndex === null) return;
             
             switch(currentDetailPage) {
@@ -4355,6 +4507,10 @@
             if (!pageId.includes('-detail')) {
                 currentDetailPage = null;
                 currentDetailIndex = null;
+            }
+            // Clear profile tracking when navigating away from profile
+            if (pageId !== 'profile') {
+                currentProfileName = null;
             }
             
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
