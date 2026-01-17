@@ -57,3 +57,93 @@
         </div>
     </div>
 </div>
+
+<script>
+(function() {
+    // Main render function - called by router after page loads
+    function renderJobDetailPage() {
+        const index = window.currentDetailIndex;
+        console.log('renderJobDetailPage called, index:', index);
+        
+        if (typeof index !== 'number' || index < 0) {
+            console.warn('No valid job index set');
+            return;
+        }
+        
+        const data = getData('jobs');
+        console.log('Jobs data:', data);
+        
+        if (!data || data.length === 0) {
+            console.warn('Jobs data not loaded yet, retrying...');
+            setTimeout(renderJobDetailPage, 100);
+            return;
+        }
+        
+        const j = data[index];
+        if (!j) {
+            console.error('Job not found at index:', index);
+            return;
+        }
+        
+        const typeClass = (j.type || '').toLowerCase().includes('intern') ? 'tag-green' : 
+                          (j.type || '').toLowerCase().includes('part') ? 'tag-amber' : 'tag-accent';
+        
+        document.getElementById('jobDetailType').textContent = j.type || 'Full-Time';
+        document.getElementById('jobDetailType').className = 'tag ' + typeClass;
+        document.getElementById('jobDetailTitle').textContent = t(j.title_en, j.title_tr) || j.title || 'Job Opening';
+        document.getElementById('jobDetailCompany').textContent = j.company || '—';
+        document.getElementById('jobDetailLocation').textContent = j.location || '—';
+        
+        const content = t(j.content_en, j.content_tr) || t(j.description_en, j.description_tr) || '';
+        document.getElementById('jobDetailContent').innerHTML = content.replace(/\n/g, '<br>');
+        
+        // Salary
+        const salaryItem = document.getElementById('jobSalaryItem');
+        if (j.salary) {
+            salaryItem.style.display = 'flex';
+            document.getElementById('jobDetailSalary').textContent = j.salary;
+        } else {
+            salaryItem.style.display = 'none';
+        }
+        
+        // Deadline
+        const deadlineItem = document.getElementById('jobDeadlineItem');
+        if (j.deadline) {
+            deadlineItem.style.display = 'flex';
+            document.getElementById('jobDetailDeadline').textContent = j.deadline;
+        } else {
+            deadlineItem.style.display = 'none';
+        }
+        
+        // Requirements
+        const reqBox = document.getElementById('jobRequirementsBox');
+        if (j.requirements) {
+            reqBox.style.display = 'block';
+            document.getElementById('jobDetailRequirements').innerHTML = j.requirements.split(',').map(r => 
+                `<span class="tag" style="margin:2px;">${r.trim()}</span>`
+            ).join('');
+        } else {
+            reqBox.style.display = 'none';
+        }
+        
+        // Apply link
+        const applyBox = document.getElementById('jobApplyBox');
+        if (j.apply_link) {
+            applyBox.style.display = 'block';
+            document.getElementById('jobApplyLink').href = j.apply_link;
+        } else {
+            applyBox.style.display = 'none';
+        }
+    }
+    
+    // Register render function with multiple naming conventions for router compatibility
+    window.renderJobDetailPage = renderJobDetailPage;
+    window['renderJob-detailPage'] = renderJobDetailPage;
+    window.renderJobdetailPage = renderJobDetailPage;
+    
+    // Also try to render immediately if data might already be loaded
+    if (typeof window.currentDetailIndex === 'number') {
+        setTimeout(renderJobDetailPage, 50);
+    }
+})();
+</script>

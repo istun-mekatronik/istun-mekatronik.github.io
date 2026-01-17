@@ -48,6 +48,19 @@
         `).join('');
     };
     
+    // Detail navigation - set index and navigate, then force render
+    window.goToResearchDetail = function(index) {
+        window.currentDetailPage = 'research';
+        window.currentDetailIndex = index;
+        Router.goTo('research-detail');
+        // Force render after a short delay to ensure page is loaded
+        setTimeout(() => {
+            if (typeof window.renderResearchDetailPage === 'function') {
+                window.renderResearchDetailPage();
+            }
+        }, 100);
+    };
+    
     // Render will be called by router after page loads
 })();
 </script>

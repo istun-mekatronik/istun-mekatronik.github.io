@@ -100,6 +100,10 @@
 </div>
 
 <script>
+// Track current modal index for language switching
+let currentNewsIndex = null;
+let currentEventIndex = null;
+
 function renderNewsPage() {
     const data = getData();
     
@@ -139,6 +143,14 @@ function renderNewsPage() {
             </div>
         </div>
     `).join('') || `<p>${t('No events.', 'Etkinlik yok.')}</p>`;
+    
+    // Re-render open modals if language changed
+    if (currentNewsIndex !== null && document.getElementById('newsDetailModal').classList.contains('show')) {
+        openNewsDetail(currentNewsIndex);
+    }
+    if (currentEventIndex !== null && document.getElementById('eventDetailModal').classList.contains('show')) {
+        openEventDetail(currentEventIndex);
+    }
 }
 
 function showNewsTab(tab, btn) {
@@ -154,6 +166,8 @@ function openNewsDetail(index) {
     const n = data.news[index];
     if (!n) return;
     
+    currentNewsIndex = index;
+    
     document.getElementById('newsDetailCategory').textContent = n.category || 'News';
     document.getElementById('newsDetailCategory').className = 'tag ' + getTagClass(n.category);
     document.getElementById('newsDetailTitle').textContent = t(n.title_en, n.title_tr);
@@ -166,12 +180,15 @@ function openNewsDetail(index) {
 
 function closeNewsDetail() {
     document.getElementById('newsDetailModal').classList.remove('show');
+    currentNewsIndex = null;
 }
 
 function openEventDetail(index) {
     const data = getData();
     const e = data.events[index];
     if (!e) return;
+    
+    currentEventIndex = index;
     
     document.getElementById('eventDetailType').textContent = e.type || 'Event';
     document.getElementById('eventDetailType').className = 'tag ' + getTagClass(e.type);
@@ -186,6 +203,7 @@ function openEventDetail(index) {
 
 function closeEventDetail() {
     document.getElementById('eventDetailModal').classList.remove('show');
+    currentEventIndex = null;
 }
 
 // Global functions for search

@@ -52,15 +52,16 @@
 
 <script>
 (function() {
-    window.goToResearchDetail = function(index) {
-        window.currentDetailPage = 'research';
-        window.currentDetailIndex = index;
-        Router.goTo('research-detail');
-        setTimeout(() => renderResearchDetail(index), 50);
-    };
-    
-    window.renderResearchDetail = function(index) {
+    function renderResearchDetailPage() {
+        const index = window.currentDetailIndex;
+        if (typeof index !== 'number' || index < 0) return;
+        
         const data = getData('research');
+        if (!data || data.length === 0) {
+            setTimeout(renderResearchDetailPage, 100);
+            return;
+        }
+        
         const r = data[index];
         if (!r) return;
         
@@ -101,6 +102,21 @@
         } else {
             equipBox.style.display = 'none';
         }
+    }
+    
+    // Also keep the legacy function name
+    window.renderResearchDetail = function(index) {
+        window.currentDetailIndex = index;
+        renderResearchDetailPage();
     };
+    
+    // Register render function with multiple naming conventions for router compatibility
+    window.renderResearchDetailPage = renderResearchDetailPage;
+    window['renderResearch-detailPage'] = renderResearchDetailPage;
+    window.renderResearchdetailPage = renderResearchDetailPage;
+    
+    if (typeof window.currentDetailIndex === 'number') {
+        setTimeout(renderResearchDetailPage, 50);
+    }
 })();
 </script>

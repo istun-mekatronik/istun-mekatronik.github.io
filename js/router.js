@@ -143,6 +143,32 @@ const Router = {
         
         // Scroll to top
         document.getElementById('mainContent').scrollTop = 0;
+        
+        // Always call render function if data is ready (for page updates on navigation)
+        if (DataManager.data.settings) {
+            this.callRenderFunction(pageId);
+        }
+    },
+    
+    callRenderFunction(pageId) {
+        // Try multiple naming conventions
+        const variations = [
+            `render${pageId.charAt(0).toUpperCase() + pageId.slice(1)}Page`,
+            `render${pageId}Page`,
+            `render${pageId.replace(/-([a-z])/g, (g) => g[1].toUpperCase()).charAt(0).toUpperCase() + pageId.replace(/-([a-z])/g, (g) => g[1].toUpperCase()).slice(1)}Page`
+        ];
+        
+        for (const fnName of variations) {
+            const fn = window[fnName];
+            if (typeof fn === 'function') {
+                try {
+                    fn();
+                } catch (err) {
+                    console.error(`Error calling ${fnName}:`, err);
+                }
+                return;
+            }
+        }
     },
     
     async loadPage(pageId, pageConfig) {
@@ -178,7 +204,22 @@ const Router = {
             await new Promise(resolve => setTimeout(resolve, 10));
             
             // Execute page render function if data is ready
-            const renderFn = window[`render${pageId.charAt(0).toUpperCase() + pageId.slice(1)}Page`];
+            // Handle page IDs with hyphens (like 'job-detail' → 'Job-detail' or convert to camelCase)
+            let fnName = `render${pageId.charAt(0).toUpperCase() + pageId.slice(1)}Page`;
+            let renderFn = window[fnName];
+            
+            // Also try with bracket notation for hyphenated names
+            if (!renderFn) {
+                renderFn = window[`render${pageId}Page`];
+            }
+            
+            // Try camelCase version (job-detail → renderJobDetailPage)
+            if (!renderFn) {
+                const camelCaseId = pageId.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+                fnName = `render${camelCaseId.charAt(0).toUpperCase() + camelCaseId.slice(1)}Page`;
+                renderFn = window[fnName];
+            }
+            
             if (typeof renderFn === 'function' && DataManager.data.settings) {
                 renderFn();
             }

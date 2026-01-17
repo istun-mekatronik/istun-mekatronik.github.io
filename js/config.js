@@ -195,6 +195,11 @@ const CONFIG = {
             file: 'pages/job-detail.html',
             requires: ['jobs'],
             nav: null
+        },
+        'profile': {
+            file: 'pages/profile.html',
+            requires: ['faculty', 'publications', 'courses', 'research', 'students', 'projects'],
+            nav: null
         }
     },
 

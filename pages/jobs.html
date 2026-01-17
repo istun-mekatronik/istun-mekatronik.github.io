@@ -66,55 +66,18 @@
         }).join('');
     };
     
-    // Detail navigation
+    // Detail navigation - set index and navigate, then force render
     window.goToJobDetail = function(index) {
+        console.log('goToJobDetail called with index:', index);
         window.currentDetailPage = 'job';
         window.currentDetailIndex = index;
         Router.goTo('job-detail');
-        setTimeout(() => renderJobDetail(index), 50);
-    };
-    
-    window.renderJobDetail = function(index) {
-        const data = getData('jobs');
-        const j = data[index];
-        if (!j) return;
-        
-        const typeClass = (j.type || '').toLowerCase().includes('intern') ? 'tag-green' : 
-                          (j.type || '').toLowerCase().includes('part') ? 'tag-amber' : 'tag-accent';
-        
-        document.getElementById('jobDetailType').textContent = j.type || 'Full-Time';
-        document.getElementById('jobDetailType').className = 'tag ' + typeClass;
-        document.getElementById('jobDetailTitle').textContent = t(j.title_en, j.title_tr);
-        document.getElementById('jobDetailCompany').textContent = j.company || '—';
-        document.getElementById('jobDetailLocation').textContent = j.location || '—';
-        document.getElementById('jobDetailContent').textContent = t(j.content_en, j.content_tr) || t(j.description_en, j.description_tr) || '';
-        
-        // Salary
-        const salaryItem = document.getElementById('jobSalaryItem');
-        if (j.salary) {
-            salaryItem.style.display = 'flex';
-            document.getElementById('jobDetailSalary').textContent = j.salary;
-        } else {
-            salaryItem.style.display = 'none';
-        }
-        
-        // Deadline
-        const deadlineItem = document.getElementById('jobDeadlineItem');
-        if (j.deadline) {
-            deadlineItem.style.display = 'flex';
-            document.getElementById('jobDetailDeadline').textContent = j.deadline;
-        } else {
-            deadlineItem.style.display = 'none';
-        }
-        
-        // Apply link
-        const applyBox = document.getElementById('jobApplyBox');
-        if (j.apply_link) {
-            applyBox.style.display = 'block';
-            document.getElementById('jobApplyLink').href = j.apply_link;
-        } else {
-            applyBox.style.display = 'none';
-        }
+        // Force render after a short delay to ensure page is loaded
+        setTimeout(() => {
+            if (typeof window.renderJobDetailPage === 'function') {
+                window.renderJobDetailPage();
+            }
+        }, 100);
     };
     
     // Render will be called by router after page loads

@@ -38,3 +38,49 @@
         </div>
     </div>
 </div>
+
+<script>
+(function() {
+    // Main render function - called by router after page loads
+    function renderLabDetailPage() {
+        const index = window.currentDetailIndex;
+        if (typeof index !== 'number' || index < 0) return;
+        
+        const data = getData('labs');
+        if (!data || data.length === 0) {
+            setTimeout(renderLabDetailPage, 100);
+            return;
+        }
+        
+        const l = data[index];
+        if (!l) {
+            console.error('Lab not found at index:', index);
+            return;
+        }
+        
+        const typeClass = (l.type || '').toLowerCase() === 'research' ? 'tag-green' : 'tag-accent';
+        
+        document.getElementById('labDetailType').textContent = l.type || 'Lab';
+        document.getElementById('labDetailType').className = 'tag ' + typeClass;
+        document.getElementById('labDetailTitle').textContent = t(l.name_en, l.name_tr) || l.name || 'Laboratory';
+        document.getElementById('labDetailRoom').textContent = l.room || '—';
+        document.getElementById('labDetailManager').textContent = l.manager || '—';
+        document.getElementById('labDetailImage').style.backgroundImage = `url('${l.image || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80'}')`;
+        
+        const content = t(l.content_en, l.content_tr) || t(l.description_en, l.description_tr) || '';
+        document.getElementById('labDetailContent').innerHTML = content.replace(/\n/g, '<br>');
+        
+        const equipment = t(l.equipment_en, l.equipment_tr) || '';
+        document.getElementById('labDetailEquipment').textContent = equipment;
+    }
+    
+    // Register render function with multiple naming conventions for router compatibility
+    window.renderLabDetailPage = renderLabDetailPage;
+    window['renderLab-detailPage'] = renderLabDetailPage;
+    window.renderLabdetailPage = renderLabDetailPage;
+    
+    if (typeof window.currentDetailIndex === 'number') {
+        setTimeout(renderLabDetailPage, 50);
+    }
+})();
+</script>

@@ -60,27 +60,17 @@
         `).join('');
     };
     
-    // Detail navigation
+    // Detail navigation - set index and navigate, then force render
     window.goToLabDetail = function(index) {
         window.currentDetailPage = 'lab';
         window.currentDetailIndex = index;
         Router.goTo('lab-detail');
-        setTimeout(() => renderLabDetail(index), 50);
-    };
-    
-    window.renderLabDetail = function(index) {
-        const data = getData('labs');
-        const l = data[index];
-        if (!l) return;
-        
-        document.getElementById('labDetailType').textContent = l.type || 'Lab';
-        document.getElementById('labDetailType').className = 'tag ' + ((l.type || '').toLowerCase() === 'research' ? 'tag-green' : 'tag-accent');
-        document.getElementById('labDetailTitle').textContent = t(l.name_en, l.name_tr);
-        document.getElementById('labDetailRoom').textContent = l.room || '—';
-        document.getElementById('labDetailManager').textContent = l.manager || '—';
-        document.getElementById('labDetailImage').style.backgroundImage = `url('${l.image || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80'}')`;
-        document.getElementById('labDetailContent').textContent = t(l.content_en, l.content_tr) || t(l.description_en, l.description_tr) || '';
-        document.getElementById('labDetailEquipment').textContent = t(l.equipment_en, l.equipment_tr) || '';
+        // Force render after a short delay to ensure page is loaded
+        setTimeout(() => {
+            if (typeof window.renderLabDetailPage === 'function') {
+                window.renderLabDetailPage();
+            }
+        }, 100);
     };
     
     // Render will be called by router after page loads

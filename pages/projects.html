@@ -83,7 +83,11 @@
         window.currentDetailPage = 'project';
         window.currentDetailIndex = index;
         Router.goTo('project-detail');
-        setTimeout(() => renderProjectDetail(index), 50);
+        setTimeout(() => {
+            if (typeof window.renderProjectDetailPage === 'function') {
+                window.renderProjectDetailPage();
+            }
+        }, 100);
     };
     
     window.renderProjectDetail = function(index) {

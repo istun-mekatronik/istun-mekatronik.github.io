@@ -51,3 +51,76 @@
         </div>
     </div>
 </div>
+
+<script>
+(function() {
+    function renderProjectDetailPage() {
+        const index = window.currentDetailIndex;
+        if (typeof index !== 'number' || index < 0) return;
+        
+        const data = getData('projects');
+        if (!data || data.length === 0) {
+            setTimeout(renderProjectDetailPage, 100);
+            return;
+        }
+        
+        const p = data[index];
+        if (!p) return;
+        
+        document.getElementById('projectDetailCategory').textContent = p.category || 'Capstone';
+        document.getElementById('projectDetailCategory').className = 'tag ' + getTagClass(p.category);
+        document.getElementById('projectDetailYear').textContent = p.year || '2024';
+        document.getElementById('projectDetailTitle').textContent = t(p.title_en, p.title_tr) || 'Project';
+        document.getElementById('projectDetailTeam').textContent = p.team || '—';
+        document.getElementById('projectDetailAdvisor').textContent = p.advisor || '—';
+        document.getElementById('projectDetailImage').style.backgroundImage = `url('${p.image || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80'}')`;
+        
+        const content = t(p.content_en, p.content_tr) || t(p.description_en, p.description_tr) || '';
+        document.getElementById('projectDetailContent').innerHTML = content.replace(/\n/g, '<br>');
+        
+        // Award
+        const awardEl = document.getElementById('projectDetailAward');
+        if (p.award) {
+            awardEl.style.display = 'inline-flex';
+            document.getElementById('projectAwardText').textContent = p.award;
+        } else {
+            awardEl.style.display = 'none';
+        }
+        
+        // Technologies
+        const techContainer = document.getElementById('projectDetailTech');
+        if (p.technologies) {
+            techContainer.innerHTML = p.technologies.split(',').map(tech => 
+                `<span class="tag" style="margin:2px;">${tech.trim()}</span>`
+            ).join('');
+        } else {
+            techContainer.innerHTML = '<span class="text-muted">—</span>';
+        }
+        
+        // GitHub link
+        const githubBox = document.getElementById('projectGithubBox');
+        if (p.github) {
+            githubBox.style.display = 'flex';
+            document.getElementById('projectGithubLink').href = p.github;
+        } else {
+            githubBox.style.display = 'none';
+        }
+        
+        // Video link
+        const videoLink = document.getElementById('projectVideoLink');
+        if (p.video) {
+            videoLink.style.display = 'inline-flex';
+            videoLink.href = p.video;
+        } else {
+            videoLink.style.display = 'none';
+        }
+    }
+    
+    window.renderProjectDetailPage = renderProjectDetailPage;
+    window['renderProject-detailPage'] = renderProjectDetailPage;
+    
+    if (typeof window.currentDetailIndex === 'number') {
+        setTimeout(renderProjectDetailPage, 50);
+    }
+})();
+</script>
