@@ -1,0 +1,102 @@
+<!-- Courses Page -->
+<div class="page-header">
+    <h1><span data-en>Course Catalog</span><span data-tr>Ders Kataloğu</span></h1>
+    <p class="subtitle"><span data-en>Undergraduate and graduate courses</span><span data-tr>Lisans ve lisansüstü dersler</span></p>
+</div>
+
+<div class="tabs" id="courseTabs">
+    <button class="tab active" onclick="filterCourses('all', this)"><span data-en>All</span><span data-tr>Tümü</span></button>
+    <button class="tab" onclick="filterCourses('undergraduate', this)"><span data-en>Undergraduate</span><span data-tr>Lisans</span></button>
+    <button class="tab" onclick="filterCourses('graduate', this)"><span data-en>Graduate</span><span data-tr>Lisansüstü</span></button>
+</div>
+
+<div id="coursesList">
+    <div class="course-item skeleton" style="height:60px;"></div>
+    <div class="course-item skeleton" style="height:60px;"></div>
+    <div class="course-item skeleton" style="height:60px;"></div>
+</div>
+
+<script>
+(function() {
+    let currentFilter = 'all';
+    
+    const icons = {
+        'physics': 'fa-atom',
+        'programming': 'fa-code',
+        'robotics': 'fa-robot',
+        'control': 'fa-gears',
+        'ai': 'fa-brain',
+        'electronics': 'fa-microchip',
+        'mechanics': 'fa-cogs',
+        'math': 'fa-calculator',
+        'design': 'fa-drafting-compass'
+    };
+    
+    const colors = {
+        'physics': 'var(--purple)',
+        'programming': 'var(--green)',
+        'robotics': 'var(--pink)',
+        'control': 'var(--amber)',
+        'ai': 'var(--accent)',
+        'electronics': 'var(--cyan)',
+        'mechanics': 'var(--red)',
+        'math': 'var(--purple)',
+        'design': 'var(--pink)'
+    };
+    
+    window.filterCourses = function(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('#courseTabs .tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        renderCoursesPage();
+    };
+    
+    window.renderCoursesPage = function() {
+        let data = getData('courses');
+        const container = document.getElementById('coursesList');
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p>${t('No courses.', 'Ders bulunamadı.')}</p>`;
+            return;
+        }
+        
+        // Filter by level if needed
+        if (currentFilter !== 'all') {
+            data = data.filter(c => {
+                const level = (c.level || '').toLowerCase();
+                if (currentFilter === 'undergraduate') {
+                    return level.includes('undergrad') || level.includes('lisans') || !level.includes('graduate');
+                }
+                return level.includes('graduate') || level.includes('lisansüstü') || level.includes('yüksek');
+            });
+        }
+        
+        // Sort by code
+        data.sort((a, b) => (a.code || '').localeCompare(b.code || ''));
+        
+        container.innerHTML = data.map(c => {
+            const cat = (c.category || 'physics').toLowerCase();
+            const icon = icons[cat] || 'fa-book';
+            const color = colors[cat] || 'var(--accent)';
+            
+            return `
+                <div class="course-item">
+                    <div class="course-icon" style="background:${color}20; color:${color};">
+                        <i class="fa-solid ${icon}"></i>
+                    </div>
+                    <div class="course-info">
+                        <h4>${c.code || ''}: ${t(c.name_en, c.name_tr)}</h4>
+                        <p>${t(c.description_en, c.description_tr) || ''} · ${c.instructor || ''} · ${c.year || ''}</p>
+                    </div>
+                    <span class="tag">${c.ects || '3'} ECTS</span>
+                </div>
+            `;
+        }).join('');
+    };
+    
+    // Auto-render on load
+    if (typeof getData === 'function' && getData('courses')) {
+        renderCoursesPage();
+    }
+})();
+</script>

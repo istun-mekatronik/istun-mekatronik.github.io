@@ -1,0 +1,125 @@
+<!-- Jobs Page -->
+<div class="page-header">
+    <h1><span data-en>Jobs & Internships</span><span data-tr>İş & Staj İlanları</span></h1>
+    <p class="subtitle"><span data-en>Career opportunities for our students and alumni</span><span data-tr>Öğrenci ve mezunlarımız için kariyer fırsatları</span></p>
+</div>
+
+<div class="tabs" id="jobTabs">
+    <button class="tab active" onclick="filterJobs('all', this)"><span data-en>All</span><span data-tr>Tümü</span></button>
+    <button class="tab" onclick="filterJobs('full-time', this)"><span data-en>Full-Time</span><span data-tr>Tam Zamanlı</span></button>
+    <button class="tab" onclick="filterJobs('internship', this)"><span data-en>Internship</span><span data-tr>Staj</span></button>
+    <button class="tab" onclick="filterJobs('part-time', this)"><span data-en>Part-Time</span><span data-tr>Yarı Zamanlı</span></button>
+</div>
+
+<div id="jobsList">
+    <div class="card-compact skeleton" style="height:70px;"></div>
+    <div class="card-compact skeleton" style="height:70px;"></div>
+</div>
+
+<script>
+(function() {
+    let currentFilter = 'all';
+    
+    window.filterJobs = function(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('#jobTabs .tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        renderJobsPage();
+    };
+    
+    function cleanText(str) {
+        if (!str) return '';
+        return str.replace(/Â·/g, '·').replace(/Â /g, ' ').replace(/Â/g, '');
+    }
+    
+    window.renderJobsPage = function() {
+        let data = getData('jobs');
+        const container = document.getElementById('jobsList');
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p>${t('No jobs available.', 'İş ilanı bulunamadı.')}</p>`;
+            return;
+        }
+        
+        // Filter by type
+        if (currentFilter !== 'all') {
+            data = data.filter(j => (j.type || '').toLowerCase().includes(currentFilter.replace('-', '')));
+        }
+        
+        container.innerHTML = data.map((j, i) => {
+            const originalIndex = getData('jobs').indexOf(j);
+            const typeClass = (j.type || '').toLowerCase().includes('intern') ? 'tag-green' : 
+                              (j.type || '').toLowerCase().includes('part') ? 'tag-amber' : 'tag-accent';
+            
+            return `
+            <div class="card-compact card-clickable" onclick="goToJobDetail(${originalIndex})" style="cursor:pointer;">
+                <div class="card-compact-icon" style="background:var(--accent-light); color:var(--accent);">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <div class="card-compact-content">
+                    <h4>${t(j.title_en, j.title_tr)}</h4>
+                    <p>${cleanText(j.company)} · ${cleanText(j.location)} ${j.salary ? '· ' + cleanText(j.salary) : ''}</p>
+                </div>
+                <span class="tag ${typeClass}">${j.type || 'Job'}</span>
+            </div>
+            `;
+        }).join('');
+    };
+    
+    // Detail navigation
+    window.goToJobDetail = function(index) {
+        window.currentDetailPage = 'job';
+        window.currentDetailIndex = index;
+        Router.goTo('job-detail');
+        setTimeout(() => renderJobDetail(index), 50);
+    };
+    
+    window.renderJobDetail = function(index) {
+        const data = getData('jobs');
+        const j = data[index];
+        if (!j) return;
+        
+        const typeClass = (j.type || '').toLowerCase().includes('intern') ? 'tag-green' : 
+                          (j.type || '').toLowerCase().includes('part') ? 'tag-amber' : 'tag-accent';
+        
+        document.getElementById('jobDetailType').textContent = j.type || 'Full-Time';
+        document.getElementById('jobDetailType').className = 'tag ' + typeClass;
+        document.getElementById('jobDetailTitle').textContent = t(j.title_en, j.title_tr);
+        document.getElementById('jobDetailCompany').textContent = j.company || '—';
+        document.getElementById('jobDetailLocation').textContent = j.location || '—';
+        document.getElementById('jobDetailContent').textContent = t(j.content_en, j.content_tr) || t(j.description_en, j.description_tr) || '';
+        
+        // Salary
+        const salaryItem = document.getElementById('jobSalaryItem');
+        if (j.salary) {
+            salaryItem.style.display = 'flex';
+            document.getElementById('jobDetailSalary').textContent = j.salary;
+        } else {
+            salaryItem.style.display = 'none';
+        }
+        
+        // Deadline
+        const deadlineItem = document.getElementById('jobDeadlineItem');
+        if (j.deadline) {
+            deadlineItem.style.display = 'flex';
+            document.getElementById('jobDetailDeadline').textContent = j.deadline;
+        } else {
+            deadlineItem.style.display = 'none';
+        }
+        
+        // Apply link
+        const applyBox = document.getElementById('jobApplyBox');
+        if (j.apply_link) {
+            applyBox.style.display = 'block';
+            document.getElementById('jobApplyLink').href = j.apply_link;
+        } else {
+            applyBox.style.display = 'none';
+        }
+    };
+    
+    // Auto-render on load
+    if (typeof getData === 'function' && getData('jobs')) {
+        renderJobsPage();
+    }
+})();
+</script>

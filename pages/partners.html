@@ -1,0 +1,86 @@
+<!-- Partners Page -->
+<div class="page-header">
+    <h1><span data-en>Partners</span><span data-tr>Ortaklar</span></h1>
+    <p class="subtitle"><span data-en>Industry and academic collaborations</span><span data-tr>Sanayi ve akademik işbirlikleri</span></p>
+</div>
+
+<h2><span data-en>Industry Partners</span><span data-tr>Sanayi Ortakları</span></h2>
+<div class="partners-row" id="industryPartners">
+    <div class="skeleton" style="width:80px; height:28px;"></div>
+</div>
+
+<h2 style="margin-top:2rem;"><span data-en>Academic Collaborations</span><span data-tr>Akademik İşbirlikleri</span></h2>
+<div id="academicPartners">
+    <div class="card-compact skeleton" style="height:60px;"></div>
+</div>
+
+<h2 style="margin-top:2rem;"><span data-en>Research Collaborations</span><span data-tr>Araştırma İşbirlikleri</span></h2>
+<div id="researchPartners">
+    <div class="card-compact skeleton" style="height:60px;"></div>
+</div>
+
+<script>
+(function() {
+    window.renderPartnersPage = function() {
+        const data = getData('partners');
+        
+        if (!data || data.length === 0) {
+            document.getElementById('industryPartners').innerHTML = `<p>${t('No partners.', 'Ortak bulunamadı.')}</p>`;
+            document.getElementById('academicPartners').innerHTML = '';
+            document.getElementById('researchPartners').innerHTML = '';
+            return;
+        }
+        
+        const industry = data.filter(p => (p.type || '').toLowerCase() === 'industry');
+        const academic = data.filter(p => (p.type || '').toLowerCase() === 'academic');
+        const research = data.filter(p => (p.type || '').toLowerCase() === 'research');
+        
+        // Industry partners (logos)
+        const industryHTML = industry.map(p => {
+            if (p.logo) {
+                return `<img src="${p.logo}" class="partner-logo" alt="${p.name}" title="${p.name}" style="height:${p.height || '24'}px;">`;
+            }
+            return `<span style="color:var(--text-muted);font-weight:600;padding:0.5rem 1rem;background:var(--bg-warm);border-radius:8px;">${p.name}</span>`;
+        }).join('');
+        
+        document.getElementById('industryPartners').innerHTML = industryHTML || `<p>${t('No industry partners.', 'Sanayi ortağı yok.')}</p>`;
+        
+        // Academic partners
+        const academicHTML = academic.map(p => `
+            <div class="card-compact">
+                <div class="card-compact-icon" style="background:var(--purple-light); color:var(--purple);">
+                    <i class="fa-solid fa-university"></i>
+                </div>
+                <div class="card-compact-content">
+                    <h4>${p.name}</h4>
+                    <p>${t(p.description_en, p.description_tr) || p.country || ''}</p>
+                </div>
+                ${p.website ? `<a href="${p.website}" target="_blank" class="btn btn-ghost btn-sm"><i class="fa-solid fa-external-link"></i></a>` : ''}
+            </div>
+        `).join('');
+        
+        document.getElementById('academicPartners').innerHTML = academicHTML || `<p>${t('No academic partners.', 'Akademik ortak yok.')}</p>`;
+        
+        // Research partners
+        const researchHTML = research.map(p => `
+            <div class="card-compact">
+                <div class="card-compact-icon" style="background:var(--green-light); color:var(--green);">
+                    <i class="fa-solid fa-flask"></i>
+                </div>
+                <div class="card-compact-content">
+                    <h4>${p.name}</h4>
+                    <p>${t(p.description_en, p.description_tr) || ''}</p>
+                </div>
+                ${p.website ? `<a href="${p.website}" target="_blank" class="btn btn-ghost btn-sm"><i class="fa-solid fa-external-link"></i></a>` : ''}
+            </div>
+        `).join('');
+        
+        document.getElementById('researchPartners').innerHTML = researchHTML || `<p>${t('No research partners.', 'Araştırma ortağı yok.')}</p>`;
+    };
+    
+    // Auto-render on load
+    if (typeof getData === 'function' && getData('partners')) {
+        renderPartnersPage();
+    }
+})();
+</script>

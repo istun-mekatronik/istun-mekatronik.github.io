@@ -1,0 +1,53 @@
+<!-- Project Detail Page -->
+<div class="detail-page">
+    <button onclick="Router.goTo('projects')" class="btn btn-ghost btn-sm detail-back">
+        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Projects</span><span data-tr>Projelere Dön</span>
+    </button>
+    
+    <div class="detail-card">
+        <div class="detail-image" id="projectDetailImage"></div>
+        <div class="detail-body">
+            <div class="detail-meta">
+                <span class="tag" id="projectDetailCategory">Capstone</span>
+                <span class="tag tag-purple" id="projectDetailYear">2024</span>
+                <span class="tag tag-green" id="projectDetailAward" style="display:none;">
+                    <i class="fa-solid fa-trophy"></i> <span id="projectAwardText"></span>
+                </span>
+            </div>
+            <h1 class="detail-title" id="projectDetailTitle">Loading...</h1>
+            
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-users"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Team</span><span data-tr>Ekip</span></span>
+                        <span class="detail-info-value" id="projectDetailTeam"></span>
+                    </div>
+                </div>
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Advisor</span><span data-tr>Danışman</span></span>
+                        <span class="detail-info-value" id="projectDetailAdvisor"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-content" id="projectDetailContent"></div>
+            
+            <div class="detail-tech-box">
+                <h4><i class="fa-solid fa-code"></i> <span data-en>Technologies</span><span data-tr>Teknolojiler</span></h4>
+                <div id="projectDetailTech" class="detail-tech-tags"></div>
+            </div>
+            
+            <div id="projectGithubBox" class="detail-actions" style="display:none;">
+                <a href="#" id="projectGithubLink" class="btn btn-ghost" target="_blank">
+                    <i class="fa-brands fa-github"></i> <span data-en>View on GitHub</span><span data-tr>GitHub'da Görüntüle</span>
+                </a>
+                <a href="#" id="projectVideoLink" class="btn btn-ghost" target="_blank" style="display:none;">
+                    <i class="fa-brands fa-youtube"></i> <span data-en>Watch Demo</span><span data-tr>Demoyu İzle</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

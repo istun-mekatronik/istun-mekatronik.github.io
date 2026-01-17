@@ -1,0 +1,194 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     NEWS & EVENTS PAGE
+     Data required: news, events
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page-header">
+    <h1><span data-en>News & Events</span><span data-tr>Haberler & Etkinlikler</span></h1>
+    <p class="subtitle">
+        <span data-en>Latest updates from the department</span>
+        <span data-tr>Bölümden son güncellemeler</span>
+    </p>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <button class="tab active" onclick="showNewsTab('news', this)">
+        <i class="fa-solid fa-newspaper"></i> 
+        <span data-en>News</span><span data-tr>Haberler</span>
+        <span class="tab-badge" id="newsTabBadge">0</span>
+    </button>
+    <button class="tab" onclick="showNewsTab('events', this)">
+        <i class="fa-solid fa-calendar"></i> 
+        <span data-en>Events</span><span data-tr>Etkinlikler</span>
+        <span class="tab-badge" id="eventsTabBadge">0</span>
+    </button>
+</div>
+
+<!-- News Tab Content -->
+<div id="newsTabContent" class="tab-content">
+    <div class="card-grid" id="allNewsGrid">
+        <div class="news-card skeleton" style="height:220px;"></div>
+        <div class="news-card skeleton" style="height:220px;"></div>
+        <div class="news-card skeleton" style="height:220px;"></div>
+    </div>
+</div>
+
+<!-- Events Tab Content -->
+<div id="eventsTabContent" class="tab-content" style="display:none;">
+    <div class="timeline" id="allEventsTimeline">
+        <div class="timeline-item"><div class="timeline-card skeleton" style="height:80px;"></div></div>
+        <div class="timeline-item"><div class="timeline-card skeleton" style="height:80px;"></div></div>
+    </div>
+</div>
+
+<!-- News Detail Modal -->
+<div class="modal-overlay" id="newsDetailModal" onclick="if(event.target===this)closeNewsDetail()">
+    <div class="detail-modal">
+        <button class="btn btn-ghost detail-close" onclick="closeNewsDetail()">
+            <i class="fa-solid fa-times"></i>
+        </button>
+        <div class="detail-image" id="newsDetailImage"></div>
+        <div class="detail-body">
+            <div class="detail-meta">
+                <span class="tag" id="newsDetailCategory">News</span>
+                <span class="detail-date"><i class="fa-solid fa-calendar"></i> <span id="newsDetailDate"></span></span>
+            </div>
+            <h1 class="detail-title" id="newsDetailTitle">Loading...</h1>
+            <div class="detail-content" id="newsDetailContent"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Event Detail Modal -->
+<div class="modal-overlay" id="eventDetailModal" onclick="if(event.target===this)closeEventDetail()">
+    <div class="detail-modal">
+        <button class="btn btn-ghost detail-close" onclick="closeEventDetail()">
+            <i class="fa-solid fa-times"></i>
+        </button>
+        <div class="detail-body">
+            <div class="detail-meta">
+                <span class="tag" id="eventDetailType">Event</span>
+            </div>
+            <h1 class="detail-title" id="eventDetailTitle">Loading...</h1>
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-calendar"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Date</span><span data-tr>Tarih</span></span>
+                        <span class="detail-info-value" id="eventDetailDate"></span>
+                    </div>
+                </div>
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-clock"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Time</span><span data-tr>Saat</span></span>
+                        <span class="detail-info-value" id="eventDetailTime"></span>
+                    </div>
+                </div>
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Location</span><span data-tr>Konum</span></span>
+                        <span class="detail-info-value" id="eventDetailLocation"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-content" id="eventDetailContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function renderNewsPage() {
+    const data = getData();
+    
+    // Update tab badges
+    document.getElementById('newsTabBadge').textContent = data.news.length;
+    document.getElementById('eventsTabBadge').textContent = data.events.length;
+    
+    // Render all news
+    document.getElementById('allNewsGrid').innerHTML = data.news.map((n, i) => {
+        const d = formatDate(n.date);
+        const color = n.category?.toLowerCase() === 'award' ? 'var(--green)' :
+                     n.category?.toLowerCase() === 'academic' ? 'var(--purple)' : 'var(--amber)';
+        return `
+            <div class="news-card card-clickable" onclick="openNewsDetail(${i})">
+                <div class="news-img" style="background-image:url('${n.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'}');">
+                    <div class="news-date" style="background:${color};">
+                        <span class="day">${d.day}</span><span class="month">${d.month}</span>
+                    </div>
+                </div>
+                <div class="news-body">
+                    <span class="tag ${getTagClass(n.category)}">${n.category || 'News'}</span>
+                    <h4>${t(n.title_en, n.title_tr)}</h4>
+                    <p>${t(n.description_en, n.description_tr)}</p>
+                </div>
+            </div>
+        `;
+    }).join('') || `<p>${t('No news.', 'Haber yok.')}</p>`;
+    
+    // Render all events
+    document.getElementById('allEventsTimeline').innerHTML = data.events.map((e, i) => `
+        <div class="timeline-item card-clickable" onclick="openEventDetail(${i})" style="cursor:pointer;">
+            <div class="timeline-date">${e.date} · ${e.time}</div>
+            <div class="timeline-card">
+                <span class="tag ${getTagClass(e.type)}">${e.type || 'Event'}</span>
+                <h4>${t(e.title_en, e.title_tr)}</h4>
+                <p>${t(e.description_en, e.description_tr)}</p>
+            </div>
+        </div>
+    `).join('') || `<p>${t('No events.', 'Etkinlik yok.')}</p>`;
+}
+
+function showNewsTab(tab, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    
+    document.getElementById('newsTabContent').style.display = tab === 'news' ? 'block' : 'none';
+    document.getElementById('eventsTabContent').style.display = tab === 'events' ? 'block' : 'none';
+}
+
+function openNewsDetail(index) {
+    const data = getData();
+    const n = data.news[index];
+    if (!n) return;
+    
+    document.getElementById('newsDetailCategory').textContent = n.category || 'News';
+    document.getElementById('newsDetailCategory').className = 'tag ' + getTagClass(n.category);
+    document.getElementById('newsDetailTitle').textContent = t(n.title_en, n.title_tr);
+    document.getElementById('newsDetailDate').textContent = n.date;
+    document.getElementById('newsDetailImage').style.backgroundImage = `url('${n.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'}')`;
+    document.getElementById('newsDetailContent').innerHTML = (t(n.content_en, n.content_tr) || t(n.description_en, n.description_tr)).replace(/\n/g, '<br>');
+    
+    document.getElementById('newsDetailModal').classList.add('show');
+}
+
+function closeNewsDetail() {
+    document.getElementById('newsDetailModal').classList.remove('show');
+}
+
+function openEventDetail(index) {
+    const data = getData();
+    const e = data.events[index];
+    if (!e) return;
+    
+    document.getElementById('eventDetailType').textContent = e.type || 'Event';
+    document.getElementById('eventDetailType').className = 'tag ' + getTagClass(e.type);
+    document.getElementById('eventDetailTitle').textContent = t(e.title_en, e.title_tr);
+    document.getElementById('eventDetailDate').textContent = e.date;
+    document.getElementById('eventDetailTime').textContent = e.time;
+    document.getElementById('eventDetailLocation').textContent = e.location;
+    document.getElementById('eventDetailContent').innerHTML = (t(e.content_en, e.content_tr) || t(e.description_en, e.description_tr)).replace(/\n/g, '<br>');
+    
+    document.getElementById('eventDetailModal').classList.add('show');
+}
+
+function closeEventDetail() {
+    document.getElementById('eventDetailModal').classList.remove('show');
+}
+
+// Global functions for search
+window.goToNewsDetail = openNewsDetail;
+window.goToEventDetail = openEventDetail;
+</script>

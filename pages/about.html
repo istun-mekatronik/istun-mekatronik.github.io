@@ -1,0 +1,60 @@
+<!-- About Page -->
+<div class="page-header">
+    <h1><span data-en>About the Department</span><span data-tr>Bölüm Hakkında</span></h1>
+    <p class="subtitle" id="aboutSubtitle">Loading...</p>
+</div>
+
+<div class="two-cols" id="aboutContent">
+    <div class="loading"><i class="fa-solid fa-spinner"></i> Loading content...</div>
+</div>
+
+<script>
+(function() {
+    window.renderAboutPage = function() {
+        const s = getSettings();
+        
+        document.getElementById('aboutSubtitle').textContent = t(s.about_subtitle_en, s.about_subtitle_tr) || t('Engineering the future', 'Geleceği mühendislik');
+        
+        document.getElementById('aboutContent').innerHTML = `
+            <div>
+                <h2>${t('Our Mission', 'Misyonumuz')}</h2>
+                <p>${t(s.mission_en, s.mission_tr) || t('To educate the next generation of mechatronics engineers.', 'Yeni nesil mekatronik mühendisleri yetiştirmek.')}</p>
+                
+                <h2>${t('Vision', 'Vizyon')}</h2>
+                <p>${t(s.vision_en, s.vision_tr) || t('To be a leading center for mechatronics research and education.', 'Mekatronik araştırma ve eğitiminde öncü bir merkez olmak.')}</p>
+                
+                <h2>${t('History', 'Tarihçe')}</h2>
+                <p>${t(s.history_en, s.history_tr) || t('The department was established to meet the growing demand for interdisciplinary engineers.', 'Bölüm, disiplinler arası mühendislere artan talebi karşılamak için kurulmuştur.')}</p>
+            </div>
+            <div>
+                <h2>${t('Accreditation', 'Akreditasyon')}</h2>
+                <p>${t(s.accreditation_en, s.accreditation_tr) || t('Our program is accredited by MÜDEK.', 'Programımız MÜDEK tarafından akreditedir.')}</p>
+                <div class="alert alert-success">
+                    <i class="fa-solid fa-certificate"></i> 
+                    ${s.accreditation_status || 'MÜDEK Accredited'}
+                </div>
+                
+                <h2>${t('Facilities', 'Tesisler')}</h2>
+                <div class="stats-grid" style="margin-top:1rem;">
+                    <div class="stat-card">
+                        <span class="stat-value">${s.stat_labs || '12'}</span>
+                        <div class="stat-label">${t('Labs', 'Lab')}</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">${s.stat_area || '2500'}m²</span>
+                        <div class="stat-label">${t('Area', 'Alan')}</div>
+                    </div>
+                </div>
+                
+                <h2 style="margin-top:1.5rem;">${t('Rankings', 'Sıralamalar')}</h2>
+                <p>${t(s.rankings_en, s.rankings_tr) || ''}</p>
+            </div>
+        `;
+    };
+    
+    // Auto-render on load
+    if (typeof getSettings === 'function' && getSettings()) {
+        renderAboutPage();
+    }
+})();
+</script>

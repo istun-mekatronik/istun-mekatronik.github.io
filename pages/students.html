@@ -1,0 +1,80 @@
+<!-- Students Page -->
+<div class="page-header">
+    <h1><span data-en>Graduate Students</span><span data-tr>Lisansüstü Öğrenciler</span></h1>
+    <p class="subtitle"><span data-en>Current MSc and PhD students</span><span data-tr>Yüksek Lisans ve Doktora öğrencileri</span></p>
+</div>
+
+<div class="tabs" id="studentTabs">
+    <button class="tab active" onclick="filterStudents('all', this)"><span data-en>All</span><span data-tr>Tümü</span></button>
+    <button class="tab" onclick="filterStudents('phd', this)"><span data-en>PhD</span><span data-tr>Doktora</span></button>
+    <button class="tab" onclick="filterStudents('msc', this)"><span data-en>MSc</span><span data-tr>Yüksek Lisans</span></button>
+</div>
+
+<div class="table-wrapper">
+    <table class="data-table" id="studentsTable">
+        <thead>
+            <tr>
+                <th><span data-en>Name</span><span data-tr>İsim</span></th>
+                <th><span data-en>Program</span><span data-tr>Program</span></th>
+                <th><span data-en>Advisor</span><span data-tr>Danışman</span></th>
+                <th><span data-en>Research Topic</span><span data-tr>Araştırma Konusu</span></th>
+                <th><span data-en>Year</span><span data-tr>Yıl</span></th>
+            </tr>
+        </thead>
+        <tbody id="studentsBody">
+            <tr>
+                <td colspan="5" class="loading"><i class="fa-solid fa-spinner"></i> Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+(function() {
+    let currentFilter = 'all';
+    
+    window.filterStudents = function(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('#studentTabs .tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        renderStudentsPage();
+    };
+    
+    window.renderStudentsPage = function() {
+        let data = getData('students');
+        const container = document.getElementById('studentsBody');
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = `<tr><td colspan="5">${t('No students.', 'Öğrenci bulunamadı.')}</td></tr>`;
+            return;
+        }
+        
+        // Filter by program
+        if (currentFilter !== 'all') {
+            data = data.filter(s => (s.program || '').toLowerCase().includes(currentFilter));
+        }
+        
+        // Sort by year (newest first)
+        data.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+        
+        container.innerHTML = data.map(s => {
+            const programClass = (s.program || '').toLowerCase().includes('phd') ? 'tag-accent' : 'tag-green';
+            
+            return `
+            <tr>
+                <td><strong>${s.name || ''}</strong></td>
+                <td><span class="tag ${programClass}">${s.program || ''}</span></td>
+                <td>${s.advisor || ''}</td>
+                <td>${s.research || ''}</td>
+                <td>${s.year || ''}</td>
+            </tr>
+            `;
+        }).join('');
+    };
+    
+    // Auto-render on load
+    if (typeof getData === 'function' && getData('students')) {
+        renderStudentsPage();
+    }
+})();
+</script>

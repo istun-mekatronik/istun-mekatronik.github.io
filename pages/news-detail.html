@@ -1,0 +1,62 @@
+<!-- News Detail Page -->
+<div class="detail-page">
+    <button onclick="Router.goTo('news')" class="btn btn-ghost btn-sm detail-back">
+        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to News</span><span data-tr>Haberlere Dön</span>
+    </button>
+    
+    <div class="detail-card">
+        <div class="detail-image" id="newsDetailImage"></div>
+        <div class="detail-body">
+            <div class="detail-meta">
+                <span class="tag" id="newsDetailCategory">News</span>
+                <span class="detail-date"><i class="fa-solid fa-calendar"></i> <span id="newsDetailDate"></span></span>
+                <span class="detail-author"><i class="fa-solid fa-user"></i> <span id="newsDetailAuthor"></span></span>
+            </div>
+            <h1 class="detail-title" id="newsDetailTitle">Loading...</h1>
+            <div class="detail-content" id="newsDetailContent"></div>
+            
+            <div id="newsDetailTagsBox" class="detail-tech-box" style="display:none;">
+                <h4><i class="fa-solid fa-tags"></i> <span data-en>Tags</span><span data-tr>Etiketler</span></h4>
+                <div id="newsDetailTags" class="detail-tech-tags"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    window.goToNewsDetail = function(index) {
+        window.currentDetailPage = 'news';
+        window.currentDetailIndex = index;
+        Router.goTo('news-detail');
+        setTimeout(() => renderNewsDetail(index), 50);
+    };
+    
+    window.renderNewsDetail = function(index) {
+        const data = getData('news');
+        const n = data[index];
+        if (!n) return;
+        
+        document.getElementById('newsDetailCategory').textContent = n.category || 'News';
+        document.getElementById('newsDetailCategory').className = 'tag ' + getTagClass(n.category);
+        document.getElementById('newsDetailTitle').textContent = t(n.title_en, n.title_tr);
+        document.getElementById('newsDetailDate').textContent = n.date || '';
+        document.getElementById('newsDetailAuthor').textContent = n.author || t('Department', 'Bölüm');
+        document.getElementById('newsDetailImage').style.backgroundImage = `url('${n.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'}')`;
+        
+        const content = t(n.content_en, n.content_tr) || t(n.description_en, n.description_tr) || '';
+        document.getElementById('newsDetailContent').innerHTML = content.replace(/\n/g, '<br>');
+        
+        // Tags
+        const tagsBox = document.getElementById('newsDetailTagsBox');
+        if (n.tags) {
+            tagsBox.style.display = 'block';
+            document.getElementById('newsDetailTags').innerHTML = n.tags.split(',').map(tag => 
+                `<span class="tag">${tag.trim()}</span>`
+            ).join('');
+        } else {
+            tagsBox.style.display = 'none';
+        }
+    };
+})();
+</script>

@@ -1,0 +1,56 @@
+<!-- Research Groups Page -->
+<div class="page-header">
+    <h1><span data-en>Research Groups</span><span data-tr>Araştırma Grupları</span></h1>
+    <p class="subtitle"><span data-en>Collaborative teams advancing engineering</span><span data-tr>Mühendisliği ileriye taşıyan ekipler</span></p>
+</div>
+<div id="researchGroups">
+    <div class="research-card skeleton" style="height:150px;"></div>
+    <div class="research-card skeleton" style="height:150px;"></div>
+</div>
+
+<script>
+(function() {
+    const colors = ['#10b981', '#6366f1', '#ec4899', '#14b8a6', '#f59e0b'];
+    const icons = ['fa-robot', 'fa-microchip', 'fa-star', 'fa-hand', 'fa-bolt'];
+    
+    window.renderResearchPage = function() {
+        const data = getData('research');
+        const container = document.getElementById('researchGroups');
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p>${t('No research groups.', 'Araştırma grubu yok.')}</p>`;
+            return;
+        }
+        
+        container.innerHTML = data.map((r, i) => `
+            <div class="research-card card-clickable" onclick="goToResearchDetail(${i})" style="cursor:pointer;">
+                <div class="research-header">
+                    <div class="research-icon" style="background:linear-gradient(135deg, ${colors[i % colors.length]}, ${colors[(i + 1) % colors.length]});">
+                        <i class="fa-solid ${icons[i % icons.length]}"></i>
+                    </div>
+                    <div class="research-info">
+                        <h3>${t(r.name_en, r.name_tr)}</h3>
+                        <p>${r.focus || ''}</p>
+                    </div>
+                </div>
+                <p class="research-desc">${t(r.description_en, r.description_tr)}</p>
+                <div class="research-members">
+                    <span class="research-member">
+                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(r.lead || 'L')}&background=0f172a&color=fff&size=32" alt="">
+                        ${r.lead} (Lead)
+                    </span>
+                    ${r.members ? `<span class="research-member">+${r.members} members</span>` : ''}
+                </div>
+                <div style="margin-top:0.75rem;text-align:right;">
+                    <span class="card-footer-link" style="color:var(--accent);font-size:0.85rem;">${t('View Details', 'Detaylar')} →</span>
+                </div>
+            </div>
+        `).join('');
+    };
+    
+    // Auto-render on load
+    if (typeof getData === 'function' && getData('research')) {
+        renderResearchPage();
+    }
+})();
+</script>

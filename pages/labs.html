@@ -1,0 +1,91 @@
+<!-- Laboratories Page -->
+<div class="page-header">
+    <h1><span data-en>Laboratories</span><span data-tr>Laboratuvarlar</span></h1>
+    <p class="subtitle"><span data-en>State-of-the-art facilities for research and education</span><span data-tr>Araştırma ve eğitim için modern tesisler</span></p>
+</div>
+
+<div class="tabs" id="labTabs">
+    <button class="tab active" onclick="filterLabs('all', this)"><span data-en>All</span><span data-tr>Tümü</span></button>
+    <button class="tab" onclick="filterLabs('research', this)"><span data-en>Research</span><span data-tr>Araştırma</span></button>
+    <button class="tab" onclick="filterLabs('teaching', this)"><span data-en>Teaching</span><span data-tr>Eğitim</span></button>
+</div>
+
+<div class="card-grid" id="labsList">
+    <div class="card skeleton" style="height:250px;"></div>
+    <div class="card skeleton" style="height:250px;"></div>
+</div>
+
+<script>
+(function() {
+    let currentFilter = 'all';
+    
+    window.filterLabs = function(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('#labTabs .tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        renderLabsPage();
+    };
+    
+    window.renderLabsPage = function() {
+        let data = getData('labs');
+        const container = document.getElementById('labsList');
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p>${t('No labs.', 'Laboratuvar bulunamadı.')}</p>`;
+            return;
+        }
+        
+        // Filter by type if needed
+        if (currentFilter !== 'all') {
+            data = data.filter(l => (l.type || '').toLowerCase().includes(currentFilter));
+        }
+        
+        container.innerHTML = data.map((l, i) => `
+            <div class="card card-clickable" onclick="goToLabDetail(${i})" style="cursor:pointer;">
+                <div class="card-img" style="background-image:url('${l.image || 'https://images.unsplash.com/photo-1562654501-a0ccc0fc3fb1?w=600&q=80'}');">
+                    <div class="card-img-overlay"></div>
+                    <div class="card-img-badge">
+                        <span class="tag ${(l.type || '').toLowerCase() === 'research' ? 'tag-green' : 'tag-accent'}">${l.type || 'Lab'}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3>${t(l.name_en, l.name_tr)}</h3>
+                    <p>${t(l.equipment_en, l.equipment_tr) || t(l.description_en, l.description_tr) || ''}</p>
+                </div>
+                <div class="card-footer">
+                    <span><i class="fa-solid fa-door-open"></i> ${l.room || ''} · ${l.manager || ''}</span>
+                    <span class="card-footer-link">${t('View Details', 'Detaylar')} →</span>
+                </div>
+            </div>
+        `).join('');
+    };
+    
+    // Detail navigation
+    window.goToLabDetail = function(index) {
+        window.currentDetailPage = 'lab';
+        window.currentDetailIndex = index;
+        Router.goTo('lab-detail');
+        setTimeout(() => renderLabDetail(index), 50);
+    };
+    
+    window.renderLabDetail = function(index) {
+        const data = getData('labs');
+        const l = data[index];
+        if (!l) return;
+        
+        document.getElementById('labDetailType').textContent = l.type || 'Lab';
+        document.getElementById('labDetailType').className = 'tag ' + ((l.type || '').toLowerCase() === 'research' ? 'tag-green' : 'tag-accent');
+        document.getElementById('labDetailTitle').textContent = t(l.name_en, l.name_tr);
+        document.getElementById('labDetailRoom').textContent = l.room || '—';
+        document.getElementById('labDetailManager').textContent = l.manager || '—';
+        document.getElementById('labDetailImage').style.backgroundImage = `url('${l.image || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80'}')`;
+        document.getElementById('labDetailContent').textContent = t(l.content_en, l.content_tr) || t(l.description_en, l.description_tr) || '';
+        document.getElementById('labDetailEquipment').textContent = t(l.equipment_en, l.equipment_tr) || '';
+    };
+    
+    // Auto-render on load
+    if (typeof getData === 'function' && getData('labs')) {
+        renderLabsPage();
+    }
+})();
+</script>

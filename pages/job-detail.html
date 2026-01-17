@@ -1,0 +1,59 @@
+<!-- Job Detail Page -->
+<div class="detail-page">
+    <button onclick="Router.goTo('jobs')" class="btn btn-ghost btn-sm detail-back">
+        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Jobs</span><span data-tr>İş İlanlarına Dön</span>
+    </button>
+    
+    <div class="detail-card">
+        <div class="detail-body">
+            <div class="detail-meta">
+                <span class="tag" id="jobDetailType">Full-time</span>
+            </div>
+            <h1 class="detail-title" id="jobDetailTitle">Loading...</h1>
+            
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-building"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Company</span><span data-tr>Şirket</span></span>
+                        <span class="detail-info-value" id="jobDetailCompany"></span>
+                    </div>
+                </div>
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Location</span><span data-tr>Konum</span></span>
+                        <span class="detail-info-value" id="jobDetailLocation"></span>
+                    </div>
+                </div>
+                <div class="detail-info-item" id="jobSalaryItem" style="display:none;">
+                    <i class="fa-solid fa-money-bill"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Salary</span><span data-tr>Maaş</span></span>
+                        <span class="detail-info-value" id="jobDetailSalary"></span>
+                    </div>
+                </div>
+                <div class="detail-info-item" id="jobDeadlineItem" style="display:none;">
+                    <i class="fa-solid fa-calendar-xmark"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Deadline</span><span data-tr>Son Tarih</span></span>
+                        <span class="detail-info-value" id="jobDetailDeadline"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-content" id="jobDetailContent"></div>
+            
+            <div id="jobRequirementsBox" class="detail-tech-box" style="display:none;">
+                <h4><i class="fa-solid fa-list-check"></i> <span data-en>Requirements</span><span data-tr>Gereksinimler</span></h4>
+                <div id="jobDetailRequirements"></div>
+            </div>
+            
+            <div id="jobApplyBox" class="detail-actions" style="display:none;">
+                <a href="#" id="jobApplyLink" class="btn btn-accent" target="_blank">
+                    <i class="fa-solid fa-paper-plane"></i> <span data-en>Apply Now</span><span data-tr>Şimdi Başvur</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

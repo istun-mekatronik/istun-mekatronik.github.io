@@ -1,0 +1,100 @@
+<!-- Event Detail Page -->
+<div class="detail-page">
+    <button onclick="Router.goTo('news')" class="btn btn-ghost btn-sm detail-back">
+        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Events</span><span data-tr>Etkinliklere Dön</span>
+    </button>
+    
+    <div class="detail-card">
+        <div class="detail-body">
+            <div class="detail-meta">
+                <span class="tag" id="eventDetailType">Event</span>
+            </div>
+            <h1 class="detail-title" id="eventDetailTitle">Loading...</h1>
+            
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-calendar"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Date</span><span data-tr>Tarih</span></span>
+                        <span class="detail-info-value" id="eventDetailDate"></span>
+                    </div>
+                </div>
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-clock"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Time</span><span data-tr>Saat</span></span>
+                        <span class="detail-info-value" id="eventDetailTime"></span>
+                    </div>
+                </div>
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Location</span><span data-tr>Konum</span></span>
+                        <span class="detail-info-value" id="eventDetailLocation"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="eventDetailSpeakerBox" class="detail-speaker-box" style="display:none;">
+                <i class="fa-solid fa-user-tie"></i>
+                <div>
+                    <span class="detail-info-label"><span data-en>Speaker</span><span data-tr>Konuşmacı</span></span>
+                    <span class="detail-info-value" id="eventDetailSpeaker"></span>
+                </div>
+            </div>
+            
+            <div class="detail-content" id="eventDetailContent"></div>
+            
+            <div id="eventRegisterBox" class="detail-actions" style="display:none;">
+                <a href="#" id="eventRegisterLink" class="btn btn-accent" target="_blank">
+                    <i class="fa-solid fa-calendar-plus"></i> <span data-en>Register Now</span><span data-tr>Şimdi Kayıt Ol</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    window.goToEventDetail = function(index) {
+        window.currentDetailPage = 'event';
+        window.currentDetailIndex = index;
+        Router.goTo('event-detail');
+        setTimeout(() => renderEventDetail(index), 50);
+    };
+    
+    window.renderEventDetail = function(index) {
+        const data = getData('events');
+        const e = data[index];
+        if (!e) return;
+        
+        document.getElementById('eventDetailType').textContent = e.type || 'Event';
+        document.getElementById('eventDetailType').className = 'tag ' + getTagClass(e.type);
+        document.getElementById('eventDetailTitle').textContent = t(e.title_en, e.title_tr);
+        document.getElementById('eventDetailDate').textContent = e.date || '—';
+        document.getElementById('eventDetailTime').textContent = e.time || '—';
+        document.getElementById('eventDetailLocation').textContent = e.location || '—';
+        
+        const content = t(e.content_en, e.content_tr) || t(e.description_en, e.description_tr) || '';
+        document.getElementById('eventDetailContent').innerHTML = content.replace(/\n/g, '<br>');
+        
+        // Speaker
+        const speakerBox = document.getElementById('eventDetailSpeakerBox');
+        if (e.speaker) {
+            speakerBox.style.display = 'flex';
+            document.getElementById('eventDetailSpeaker').textContent = e.speaker;
+        } else {
+            speakerBox.style.display = 'none';
+        }
+        
+        // Registration link
+        const registerBox = document.getElementById('eventRegisterBox');
+        if (e.registration_link) {
+            registerBox.style.display = 'block';
+            document.getElementById('eventRegisterLink').href = e.registration_link;
+        } else {
+            registerBox.style.display = 'none';
+        }
+    };
+})();
+</script>

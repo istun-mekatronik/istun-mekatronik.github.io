@@ -1,0 +1,106 @@
+<!-- Research Detail Page -->
+<div class="detail-page">
+    <button onclick="Router.goTo('research')" class="btn btn-ghost btn-sm detail-back">
+        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Research</span><span data-tr>Araştırmaya Dön</span>
+    </button>
+    
+    <div class="detail-card">
+        <div class="detail-image" id="researchDetailImage"></div>
+        <div class="detail-body">
+            <div class="detail-meta">
+                <span class="tag tag-green" id="researchDetailType">Research</span>
+            </div>
+            <h1 class="detail-title" id="researchDetailTitle">Loading...</h1>
+            <p class="subtitle" id="researchDetailFocus" style="color:var(--text-muted);margin-bottom:1.5rem;"></p>
+            
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Lead Researcher</span><span data-tr>Araştırma Lideri</span></span>
+                        <span class="detail-info-value" id="researchDetailLead"></span>
+                    </div>
+                </div>
+                <div class="detail-info-item">
+                    <i class="fa-solid fa-users"></i>
+                    <div>
+                        <span class="detail-info-label"><span data-en>Team Size</span><span data-tr>Ekip Büyüklüğü</span></span>
+                        <span class="detail-info-value" id="researchDetailMembers"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-content" id="researchDetailContent"></div>
+            
+            <div class="detail-equipment-box" id="researchPublicationsBox" style="display:none;">
+                <h4><i class="fa-solid fa-book"></i> <span data-en>Key Publications</span><span data-tr>Önemli Yayınlar</span></h4>
+                <p id="researchDetailPublications"></p>
+            </div>
+            
+            <div class="detail-equipment-box" id="researchProjectsBox" style="display:none;background:linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);border-left:4px solid var(--purple);">
+                <h4 style="color:var(--purple);"><i class="fa-solid fa-flask"></i> <span data-en>Active Projects</span><span data-tr>Aktif Projeler</span></h4>
+                <p id="researchDetailProjects"></p>
+            </div>
+            
+            <div class="detail-equipment-box" id="researchEquipmentBox" style="display:none;">
+                <h4><i class="fa-solid fa-wrench"></i> <span data-en>Equipment & Tools</span><span data-tr>Ekipman ve Araçlar</span></h4>
+                <p id="researchDetailEquipment"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    window.goToResearchDetail = function(index) {
+        window.currentDetailPage = 'research';
+        window.currentDetailIndex = index;
+        Router.goTo('research-detail');
+        setTimeout(() => renderResearchDetail(index), 50);
+    };
+    
+    window.renderResearchDetail = function(index) {
+        const data = getData('research');
+        const r = data[index];
+        if (!r) return;
+        
+        document.getElementById('researchDetailTitle').textContent = t(r.name_en, r.name_tr);
+        document.getElementById('researchDetailFocus').textContent = r.focus || '';
+        document.getElementById('researchDetailType').textContent = r.type || 'Research';
+        document.getElementById('researchDetailLead').textContent = r.lead || '—';
+        document.getElementById('researchDetailMembers').textContent = r.members ? `${r.members} ${t('members', 'üye')}` : '—';
+        document.getElementById('researchDetailImage').style.backgroundImage = `url('${r.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&q=80'}')`;
+        
+        // Content with proper line breaks
+        const content = t(r.content_en, r.content_tr) || t(r.description_en, r.description_tr);
+        document.getElementById('researchDetailContent').innerHTML = content ? content.replace(/\n/g, '<br>') : '';
+        
+        // Publications
+        const pubBox = document.getElementById('researchPublicationsBox');
+        if (r.publications) {
+            pubBox.style.display = 'block';
+            document.getElementById('researchDetailPublications').textContent = r.publications;
+        } else {
+            pubBox.style.display = 'none';
+        }
+        
+        // Projects
+        const projBox = document.getElementById('researchProjectsBox');
+        if (r.projects) {
+            projBox.style.display = 'block';
+            document.getElementById('researchDetailProjects').textContent = r.projects;
+        } else {
+            projBox.style.display = 'none';
+        }
+        
+        // Equipment
+        const equipBox = document.getElementById('researchEquipmentBox');
+        if (r.equipment) {
+            equipBox.style.display = 'block';
+            document.getElementById('researchDetailEquipment').textContent = r.equipment;
+        } else {
+            equipBox.style.display = 'none';
+        }
+    };
+})();
+</script>

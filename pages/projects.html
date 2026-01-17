@@ -1,0 +1,137 @@
+<!-- Projects Page -->
+<div class="page-header">
+    <h1><span data-en>Student Projects</span><span data-tr>Öğrenci Projeleri</span></h1>
+    <p class="subtitle"><span data-en>Capstone projects and competitions</span><span data-tr>Bitirme projeleri ve yarışmalar</span></p>
+</div>
+
+<div class="tabs" id="projectTabs">
+    <button class="tab active" onclick="filterProjects('all', this)"><span data-en>All</span><span data-tr>Tümü</span></button>
+    <button class="tab" onclick="filterProjects('capstone', this)"><span data-en>Capstone</span><span data-tr>Bitirme</span></button>
+    <button class="tab" onclick="filterProjects('competition', this)"><span data-en>Competition</span><span data-tr>Yarışma</span></button>
+    <button class="tab" onclick="filterProjects('award', this)"><i class="fa-solid fa-trophy"></i> <span data-en>Award Winners</span><span data-tr>Ödüllüler</span></button>
+</div>
+
+<div class="card-grid card-grid-sm" id="projectsList">
+    <div class="project-card skeleton" style="height:220px;"></div>
+    <div class="project-card skeleton" style="height:220px;"></div>
+    <div class="project-card skeleton" style="height:220px;"></div>
+</div>
+
+<script>
+(function() {
+    let currentFilter = 'all';
+    
+    window.filterProjects = function(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('#projectTabs .tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        renderProjectsPage();
+    };
+    
+    window.renderProjectsPage = function() {
+        let data = getData('projects');
+        const container = document.getElementById('projectsList');
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p>${t('No projects.', 'Proje bulunamadı.')}</p>`;
+            return;
+        }
+        
+        // Filter
+        if (currentFilter !== 'all') {
+            if (currentFilter === 'award') {
+                data = data.filter(p => p.award);
+            } else {
+                data = data.filter(p => (p.category || '').toLowerCase().includes(currentFilter));
+            }
+        }
+        
+        // Sort by year (newest first)
+        data.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+        
+        container.innerHTML = data.map((p, i) => {
+            // Get original index for detail navigation
+            const originalIndex = getData('projects').indexOf(p);
+            
+            return `
+            <div class="project-card card-clickable" onclick="goToProjectDetail(${originalIndex})" style="cursor:pointer;">
+                <div class="project-img" style="background-image:url('${p.image || 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?w=600&q=80'}');">
+                    <span class="project-year" ${p.award ? 'style="background:var(--amber);"' : ''}>
+                        ${p.award ? '🏆 ' : ''}${p.year || '2024'}
+                    </span>
+                </div>
+                <div class="project-body">
+                    <span class="tag ${getTagClass(p.category)}">${p.category || 'Capstone'}</span>
+                    <h4>${t(p.title_en, p.title_tr)}</h4>
+                    <p>${(t(p.description_en, p.description_tr) || '').substring(0, 100)}...</p>
+                    <div class="project-team">
+                        <div class="project-avatars">
+                            ${(p.team || 'Team').split(',').slice(0, 3).map(m => 
+                                `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(m.trim())}&background=6366f1&color=fff&size=44" alt="">`
+                            ).join('')}
+                        </div>
+                        <span class="project-names">${p.team || ''}</span>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+    };
+    
+    // Detail navigation
+    window.goToProjectDetail = function(index) {
+        window.currentDetailPage = 'project';
+        window.currentDetailIndex = index;
+        Router.goTo('project-detail');
+        setTimeout(() => renderProjectDetail(index), 50);
+    };
+    
+    window.renderProjectDetail = function(index) {
+        const data = getData('projects');
+        const p = data[index];
+        if (!p) return;
+        
+        document.getElementById('projectDetailCategory').textContent = p.category || 'Project';
+        document.getElementById('projectDetailCategory').className = 'tag ' + getTagClass(p.category);
+        document.getElementById('projectDetailYear').textContent = p.year || '';
+        document.getElementById('projectDetailTitle').textContent = t(p.title_en, p.title_tr);
+        document.getElementById('projectDetailTeam').textContent = p.team || '—';
+        document.getElementById('projectDetailAdvisor').textContent = p.advisor || '—';
+        document.getElementById('projectDetailImage').style.backgroundImage = `url('${p.image || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80'}')`;
+        document.getElementById('projectDetailContent').textContent = t(p.content_en, p.content_tr) || t(p.description_en, p.description_tr) || '';
+        
+        // Award
+        const awardBadge = document.getElementById('projectDetailAward');
+        if (p.award) {
+            awardBadge.style.display = 'inline-flex';
+            document.getElementById('projectAwardText').textContent = p.award;
+        } else {
+            awardBadge.style.display = 'none';
+        }
+        
+        // Technologies
+        const techContainer = document.getElementById('projectDetailTech');
+        if (p.technologies) {
+            techContainer.innerHTML = p.technologies.split(',').map(tech => 
+                `<span class="tag">${tech.trim()}</span>`
+            ).join('');
+        } else {
+            techContainer.innerHTML = '';
+        }
+        
+        // GitHub
+        const githubBox = document.getElementById('projectGithubBox');
+        if (p.github) {
+            githubBox.style.display = 'block';
+            document.getElementById('projectGithubLink').href = p.github;
+        } else {
+            githubBox.style.display = 'none';
+        }
+    };
+    
+    // Auto-render on load
+    if (typeof getData === 'function' && getData('projects')) {
+        renderProjectsPage();
+    }
+})();
+</script>

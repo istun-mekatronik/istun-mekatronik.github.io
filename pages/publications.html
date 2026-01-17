@@ -1,0 +1,66 @@
+<!-- Publications Page -->
+<div class="page-header">
+    <h1><span data-en>Publications</span><span data-tr>Yayınlar</span></h1>
+    <p class="subtitle"><span data-en>Recent scholarly work from our faculty</span><span data-tr>Akademik kadromuzun son çalışmaları</span></p>
+</div>
+
+<div class="tabs" id="pubTabs">
+    <button class="tab active" onclick="filterPublications('all', this)"><span data-en>All</span><span data-tr>Tümü</span></button>
+    <button class="tab" onclick="filterPublications('journal', this)"><span data-en>Journals</span><span data-tr>Dergiler</span></button>
+    <button class="tab" onclick="filterPublications('conference', this)"><span data-en>Conferences</span><span data-tr>Konferanslar</span></button>
+</div>
+
+<div id="publicationsList">
+    <div class="pub-item skeleton" style="height:90px;"></div>
+    <div class="pub-item skeleton" style="height:90px;"></div>
+    <div class="pub-item skeleton" style="height:90px;"></div>
+</div>
+
+<script>
+(function() {
+    let currentFilter = 'all';
+    
+    window.filterPublications = function(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('#pubTabs .tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        renderPublicationsPage();
+    };
+    
+    window.renderPublicationsPage = function() {
+        let data = getData('publications');
+        const container = document.getElementById('publicationsList');
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p>${t('No publications.', 'Yayın bulunamadı.')}</p>`;
+            return;
+        }
+        
+        // Filter by type if needed
+        if (currentFilter !== 'all') {
+            data = data.filter(p => (p.type || '').toLowerCase().includes(currentFilter));
+        }
+        
+        // Sort by year (newest first)
+        data.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+        
+        container.innerHTML = data.map(p => `
+            <div class="pub-item">
+                <div class="pub-title">${p.title || ''}</div>
+                <div class="pub-authors">${p.authors || ''}</div>
+                <div class="pub-meta">
+                    <span><i class="fa-solid fa-book"></i> ${p.journal || p.venue || ''}, ${p.year || ''}</span>
+                    ${p.citations ? `<span><i class="fa-solid fa-quote-left"></i> ${p.citations} citations</span>` : ''}
+                    ${p.doi ? `<span><i class="fa-solid fa-link"></i> <a href="${p.doi}" target="_blank">DOI</a></span>` : ''}
+                    ${p.type ? `<span class="tag ${p.type.toLowerCase().includes('journal') ? 'tag-accent' : 'tag-green'}">${p.type}</span>` : ''}
+                </div>
+            </div>
+        `).join('');
+    };
+    
+    // Auto-render on load
+    if (typeof getData === 'function' && getData('publications')) {
+        renderPublicationsPage();
+    }
+})();
+</script>

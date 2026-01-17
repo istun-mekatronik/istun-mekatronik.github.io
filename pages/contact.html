@@ -1,0 +1,111 @@
+<!-- Contact Page -->
+<div class="page-header">
+    <h1><span data-en>Contact</span><span data-tr>İletişim</span></h1>
+    <p class="subtitle"><span data-en>Get in touch with us</span><span data-tr>Bize ulaşın</span></p>
+</div>
+
+<div class="two-cols" id="contactContent">
+    <div class="loading"><i class="fa-solid fa-spinner"></i> Loading...</div>
+</div>
+
+<script>
+(function() {
+    window.renderContactPage = function() {
+        const s = getSettings();
+        
+        document.getElementById('contactContent').innerHTML = `
+            <div>
+                <h2>${t('Department Office', 'Bölüm Sekreterliği')}</h2>
+                <div class="card-compact" style="margin-bottom:0.5rem;">
+                    <div class="card-compact-icon" style="background:var(--accent-light); color:var(--accent);">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <div class="card-compact-content">
+                        <h4>${t('Address', 'Adres')}</h4>
+                        <p>${s.address || t('İSTÜN Sütlüce Campus, Beyoğlu, İstanbul', 'İSTÜN Sütlüce Kampüsü, Beyoğlu, İstanbul')}</p>
+                    </div>
+                </div>
+                
+                <div class="card-compact" style="margin-bottom:0.5rem;">
+                    <div class="card-compact-icon" style="background:var(--green-light); color:var(--green);">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                    <div class="card-compact-content">
+                        <h4>${t('Phone', 'Telefon')}</h4>
+                        <p>${s.phone || '+90 212 XXX XX XX'}</p>
+                    </div>
+                </div>
+                
+                <div class="card-compact" style="margin-bottom:0.5rem;">
+                    <div class="card-compact-icon" style="background:var(--amber-light); color:var(--amber);">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div class="card-compact-content">
+                        <h4>${t('Email', 'E-posta')}</h4>
+                        <p><a href="mailto:${s.email || 'mechatronics@istun.edu.tr'}">${s.email || 'mechatronics@istun.edu.tr'}</a></p>
+                    </div>
+                </div>
+                
+                <div class="card-compact" style="margin-bottom:1.5rem;">
+                    <div class="card-compact-icon" style="background:var(--purple-light); color:var(--purple);">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="card-compact-content">
+                        <h4>${t('Office Hours', 'Çalışma Saatleri')}</h4>
+                        <p>${s.hours || t('Mon-Fri 09:00-17:00', 'Pzt-Cum 09:00-17:00')}</p>
+                    </div>
+                </div>
+                
+                <h2>${t('Key Contacts', 'Önemli Kişiler')}</h2>
+                <div class="card-compact" style="margin-bottom:0.5rem;">
+                    <div class="card-compact-icon" style="background:var(--primary); color:white;">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div class="card-compact-content">
+                        <h4>${t('Department Chair', 'Bölüm Başkanı')}</h4>
+                        <p>${s.chair || '—'}</p>
+                    </div>
+                </div>
+                
+                <div class="card-compact">
+                    <div class="card-compact-icon" style="background:var(--cyan-light); color:var(--cyan);">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div class="card-compact-content">
+                        <h4>${t('Graduate Coordinator', 'Lisansüstü Koordinatörü')}</h4>
+                        <p>${s.grad_coordinator || '—'}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h2>${t('Location', 'Konum')}</h2>
+                <div style="border-radius:var(--radius-lg); overflow:hidden; border:1px solid var(--border); height:300px; margin-bottom:1.5rem;">
+                    <iframe 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0" 
+                        loading="lazy" 
+                        allowfullscreen 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        src="${s.map_embed || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3008.5827157498347!2d28.948493112251263!3d41.05625357122427!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cabba389541ebd%3A0x77aa0f2806492df6!2z%C4%B0stanbul%20Sa%C4%9Fl%C4%B1k%20ve%20Teknoloji%20%C3%9Cniversitesi!5e0!3m2!1str!2str!4v1767903088679!5m2!1str!2str'}">
+                    </iframe>
+                </div>
+                
+                <h2>${t('Social Media', 'Sosyal Medya')}</h2>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    ${s.twitter ? `<a href="${s.twitter}" target="_blank" class="btn btn-ghost"><i class="fa-brands fa-twitter"></i> Twitter</a>` : ''}
+                    ${s.linkedin ? `<a href="${s.linkedin}" target="_blank" class="btn btn-ghost"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>` : ''}
+                    ${s.youtube ? `<a href="${s.youtube}" target="_blank" class="btn btn-ghost"><i class="fa-brands fa-youtube"></i> YouTube</a>` : ''}
+                    ${s.instagram ? `<a href="${s.instagram}" target="_blank" class="btn btn-ghost"><i class="fa-brands fa-instagram"></i> Instagram</a>` : ''}
+                </div>
+            </div>
+        `;
+    };
+    
+    // Auto-render on load
+    if (typeof getSettings === 'function' && getSettings()) {
+        renderContactPage();
+    }
+})();
+</script>

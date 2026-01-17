@@ -1,0 +1,236 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     HOME PAGE
+     Data required: settings, news, events, research, projects, partners
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Hero Section -->
+<div class="hero">
+    <div class="hero-content">
+        <h1 id="heroTitle">Loading...</h1>
+        <p id="heroSubtitle">Loading department information...</p>
+        <div class="hero-actions">
+            <button class="btn btn-primary btn-lg" onclick="Router.goTo('research')">
+                <i class="fa-solid fa-flask"></i> 
+                <span data-en>Research</span><span data-tr>Araştırma</span>
+            </button>
+            <button class="btn btn-primary btn-lg" onclick="Router.goTo('projects')">
+                <i class="fa-solid fa-rocket"></i> 
+                <span data-en>Projects</span><span data-tr>Projeler</span>
+            </button>
+            <button class="btn btn-ghost btn-lg">
+                <i class="fa-solid fa-play"></i> 
+                <span data-en>Video</span><span data-tr>Video</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid" id="homeStatsGrid">
+    <div class="stat-card skeleton" style="height:70px;"></div>
+    <div class="stat-card skeleton" style="height:70px;"></div>
+    <div class="stat-card skeleton" style="height:70px;"></div>
+    <div class="stat-card skeleton" style="height:70px;"></div>
+    <div class="stat-card skeleton" style="height:70px;"></div>
+    <div class="stat-card skeleton" style="height:70px;"></div>
+</div>
+
+<!-- Quick Links -->
+<div class="quick-links">
+    <a class="quick-link" onclick="Router.goTo('projects')">
+        <i class="fa-solid fa-lightbulb"></i>
+        <span data-en>Capstone</span><span data-tr>Bitirme</span>
+    </a>
+    <a class="quick-link" onclick="Router.goTo('courses')">
+        <i class="fa-solid fa-calendar-check"></i>
+        <span data-en>Courses</span><span data-tr>Dersler</span>
+    </a>
+    <a class="quick-link" onclick="Router.goTo('labs')">
+        <i class="fa-solid fa-flask-vial"></i>
+        <span data-en>Labs</span><span data-tr>Lablar</span>
+    </a>
+    <a class="quick-link" onclick="Router.goTo('news')">
+        <i class="fa-solid fa-video"></i>
+        <span data-en>Seminars</span><span data-tr>Seminerler</span>
+    </a>
+    <a class="quick-link" onclick="Router.goTo('jobs')">
+        <i class="fa-solid fa-briefcase"></i>
+        <span data-en>Jobs</span><span data-tr>İşler</span>
+    </a>
+    <a class="quick-link" onclick="Router.goTo('contact')">
+        <i class="fa-solid fa-envelope"></i>
+        <span data-en>Contact</span><span data-tr>İletişim</span>
+    </a>
+</div>
+
+<!-- Featured Research -->
+<section class="section">
+    <div class="section-header">
+        <h2><span data-en>Featured Research</span><span data-tr>Öne Çıkan Araştırma</span></h2>
+        <button class="btn btn-ghost btn-sm" onclick="Router.goTo('research')">
+            <span data-en>View All</span><span data-tr>Tümü</span> →
+        </button>
+    </div>
+    <div class="card-grid" id="homeFeaturedResearch">
+        <div class="card skeleton" style="height:260px;"></div>
+        <div class="card skeleton" style="height:260px;"></div>
+        <div class="card skeleton" style="height:260px;"></div>
+    </div>
+</section>
+
+<!-- Student Projects -->
+<section class="section">
+    <div class="section-header">
+        <h2><span data-en>Student Projects</span><span data-tr>Öğrenci Projeleri</span></h2>
+        <button class="btn btn-ghost btn-sm" onclick="Router.goTo('projects')">
+            <span data-en>All Projects</span><span data-tr>Tüm Projeler</span> →
+        </button>
+    </div>
+    <div class="card-grid card-grid-sm" id="homeFeaturedProjects">
+        <div class="project-card skeleton" style="height:220px;"></div>
+        <div class="project-card skeleton" style="height:220px;"></div>
+        <div class="project-card skeleton" style="height:220px;"></div>
+        <div class="project-card skeleton" style="height:220px;"></div>
+    </div>
+</section>
+
+<!-- Latest News -->
+<section class="section">
+    <div class="section-header">
+        <h2><span data-en>Latest News</span><span data-tr>Son Haberler</span></h2>
+        <button class="btn btn-ghost btn-sm" onclick="Router.goTo('news')">
+            <span data-en>All News</span><span data-tr>Tüm Haberler</span> →
+        </button>
+    </div>
+    <div class="card-grid" id="homeLatestNews">
+        <div class="news-card skeleton" style="height:220px;"></div>
+        <div class="news-card skeleton" style="height:220px;"></div>
+        <div class="news-card skeleton" style="height:220px;"></div>
+    </div>
+</section>
+
+<!-- Upcoming Events -->
+<section class="section">
+    <div class="section-header">
+        <h2><span data-en>Upcoming Events</span><span data-tr>Yaklaşan Etkinlikler</span></h2>
+    </div>
+    <div class="timeline" id="homeUpcomingEvents">
+        <div class="timeline-item"><div class="timeline-card skeleton" style="height:80px;"></div></div>
+        <div class="timeline-item"><div class="timeline-card skeleton" style="height:80px;"></div></div>
+    </div>
+</section>
+
+<!-- Partners -->
+<section class="section">
+    <div class="section-header">
+        <h2><span data-en>Industry Partners</span><span data-tr>Sanayi Ortakları</span></h2>
+    </div>
+    <div class="partners-row" id="homePartners">
+        <div class="skeleton" style="width:80px; height:24px;"></div>
+        <div class="skeleton" style="width:80px; height:24px;"></div>
+        <div class="skeleton" style="width:80px; height:24px;"></div>
+    </div>
+</section>
+
+<!-- Page Render Script -->
+<script>
+function renderHomePage() {
+    const data = getData();
+    const settings = getSettings();
+    
+    // Hero
+    document.getElementById('heroTitle').textContent = t(settings.hero_title_en, settings.hero_title_tr) || 'Engineering Intelligent Systems';
+    document.getElementById('heroSubtitle').textContent = t(settings.hero_subtitle_en, settings.hero_subtitle_tr) || '';
+    
+    // Stats
+    const stats = [
+        { value: settings.stat_faculty || '18', label: t('Faculty', 'Akademisyen') },
+        { value: settings.stat_students || '450', label: t('Students', 'Öğrenci') },
+        { value: settings.stat_publications || '127', label: t('Publications', 'Yayın') },
+        { value: settings.stat_grants || '₺18M', label: t('Grants', 'Hibe') },
+        { value: settings.stat_employment || '94%', label: t('Employment', 'İstihdam') },
+        { value: settings.stat_partners || '32', label: t('Partners', 'Ortak') }
+    ];
+    
+    document.getElementById('homeStatsGrid').innerHTML = stats.map(s => `
+        <div class="stat-card">
+            <span class="stat-value">${s.value}</span>
+            <div class="stat-label">${s.label}</div>
+        </div>
+    `).join('');
+    
+    // Featured Research (random 3)
+    const shuffledResearch = [...data.research].sort(() => Math.random() - 0.5).slice(0, 3);
+    document.getElementById('homeFeaturedResearch').innerHTML = shuffledResearch.map(r => `
+        <div class="card card-clickable" onclick="Router.goTo('research')">
+            <div class="card-img" style="background-image:url('${r.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&q=80'}');">
+                <div class="card-img-overlay"></div>
+                <div class="card-img-badge"><span class="tag tag-green">${r.type || 'Lab'}</span></div>
+            </div>
+            <div class="card-body">
+                <h3>${t(r.name_en, r.name_tr)}</h3>
+                <p>${t(r.description_en, r.description_tr)}</p>
+            </div>
+            <div class="card-footer">
+                <span>${r.lead}</span>
+                <span class="card-footer-link">${t('Learn more', 'Detaylar')} →</span>
+            </div>
+        </div>
+    `).join('') || `<p>${t('No research groups.', 'Araştırma grubu yok.')}</p>`;
+    
+    // Featured Projects (first 4)
+    document.getElementById('homeFeaturedProjects').innerHTML = data.projects.slice(0, 4).map(p => `
+        <div class="project-card card-clickable" onclick="Router.goTo('projects')">
+            <div class="project-img" style="background-image:url('${p.image || 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?w=600&q=80'}');">
+                <span class="project-year">${p.year || '2024'}</span>
+            </div>
+            <div class="project-body">
+                <span class="tag ${getTagClass(p.category)}">${p.category}</span>
+                <h4>${t(p.title_en, p.title_tr)}</h4>
+                <p>${t(p.description_en, p.description_tr)}</p>
+            </div>
+        </div>
+    `).join('') || `<p>${t('No projects.', 'Proje yok.')}</p>`;
+    
+    // Latest News (first 3)
+    document.getElementById('homeLatestNews').innerHTML = data.news.slice(0, 3).map(n => {
+        const d = formatDate(n.date);
+        const color = n.category?.toLowerCase() === 'award' ? 'var(--green)' :
+                     n.category?.toLowerCase() === 'academic' ? 'var(--purple)' : 'var(--amber)';
+        return `
+            <div class="news-card card-clickable" onclick="Router.goTo('news')">
+                <div class="news-img" style="background-image:url('${n.image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'}');">
+                    <div class="news-date" style="background:${color};">
+                        <span class="day">${d.day}</span><span class="month">${d.month}</span>
+                    </div>
+                </div>
+                <div class="news-body">
+                    <span class="tag ${getTagClass(n.category)}">${n.category || 'News'}</span>
+                    <h4>${t(n.title_en, n.title_tr)}</h4>
+                    <p>${t(n.description_en, n.description_tr)}</p>
+                </div>
+            </div>
+        `;
+    }).join('') || `<p>${t('No news.', 'Haber yok.')}</p>`;
+    
+    // Upcoming Events (first 4)
+    document.getElementById('homeUpcomingEvents').innerHTML = data.events.slice(0, 4).map(e => `
+        <div class="timeline-item">
+            <div class="timeline-date">${e.date} · ${e.time}</div>
+            <div class="timeline-card">
+                <span class="tag ${getTagClass(e.type)}">${e.type || 'Event'}</span>
+                <h4>${t(e.title_en, e.title_tr)}</h4>
+                <p>${t(e.description_en, e.description_tr)}</p>
+            </div>
+        </div>
+    `).join('') || `<p>${t('No events.', 'Etkinlik yok.')}</p>`;
+    
+    // Partners
+    const partners = data.partners.filter(p => p.type?.toLowerCase() === 'industry');
+    document.getElementById('homePartners').innerHTML = partners.map(p =>
+        p.logo 
+            ? `<img src="${p.logo}" class="partner-logo" alt="${p.name}" title="${p.name}" style="height:${p.height || '24'}px;">`
+            : `<span style="color:var(--text-muted);font-weight:600;">${p.name}</span>`
+    ).join('') || `<p>${t('No partners.', 'Ortak yok.')}</p>`;
+}
+</script>

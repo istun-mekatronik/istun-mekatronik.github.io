@@ -1,0 +1,75 @@
+<!-- Alumni Page -->
+<div class="page-header">
+    <h1><span data-en>Alumni</span><span data-tr>Mezunlar</span></h1>
+    <p class="subtitle"><span data-en>Where our graduates work and what they achieve</span><span data-tr>Mezunlarımızın çalıştığı yerler ve başarıları</span></p>
+</div>
+
+<div class="stats-grid" id="alumniStats">
+    <div class="stat-card skeleton" style="height:70px;"></div>
+    <div class="stat-card skeleton" style="height:70px;"></div>
+    <div class="stat-card skeleton" style="height:70px;"></div>
+</div>
+
+<h2><span data-en>Notable Alumni</span><span data-tr>Öne Çıkan Mezunlar</span></h2>
+
+<div class="card-grid card-grid-sm" id="alumniList">
+    <div class="card-compact skeleton" style="height:60px;"></div>
+    <div class="card-compact skeleton" style="height:60px;"></div>
+</div>
+
+<script>
+(function() {
+    window.renderAlumniPage = function() {
+        const settings = getSettings();
+        const data = getData('alumni');
+        
+        // Stats from settings
+        document.getElementById('alumniStats').innerHTML = `
+            <div class="stat-card">
+                <span class="stat-value">${settings.alumni_total || '320'}</span>
+                <div class="stat-label">${t('Total Alumni', 'Toplam Mezun')}</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">${settings.alumni_employed || '94%'}</span>
+                <div class="stat-label">${t('Employed', 'İstihdam')}</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">${settings.alumni_startups || '8'}</span>
+                <div class="stat-label">${t('Startups', 'Girişim')}</div>
+            </div>
+        `;
+        
+        // Alumni list
+        const container = document.getElementById('alumniList');
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p>${t('No alumni data.', 'Mezun verisi yok.')}</p>`;
+            return;
+        }
+        
+        // Sort by year (newest first)
+        const sorted = [...data].sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+        
+        container.innerHTML = sorted.map(a => {
+            const yearDisplay = a.year ? ` (${a.year})` : '';
+            
+            return `
+            <div class="card-compact">
+                <img src="${a.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.name || 'A')}&background=6366f1&color=fff&size=80`}" 
+                     style="width:44px;height:44px;border-radius:50%;object-fit:cover;" alt="${a.name || ''}">
+                <div class="card-compact-content">
+                    <h4>${a.name || ''}${yearDisplay}</h4>
+                    <p>${a.position || ''} @ ${a.company || ''}</p>
+                </div>
+                ${a.linkedin ? `<a href="${a.linkedin}" target="_blank" class="btn btn-ghost btn-sm" onclick="event.stopPropagation()"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+            </div>
+            `;
+        }).join('');
+    };
+    
+    // Auto-render on load
+    if (typeof getData === 'function' && getData('alumni')) {
+        renderAlumniPage();
+    }
+})();
+</script>
