@@ -161,9 +161,23 @@ const Router = {
             document.getElementById('mainContent').appendChild(pageDiv);
             this.loadedPages[pageId] = true;
             
-            // Execute page init if exists
-            if (window[`init${pageId.charAt(0).toUpperCase() + pageId.slice(1)}Page`]) {
-                window[`init${pageId.charAt(0).toUpperCase() + pageId.slice(1)}Page`]();
+            // Execute any script tags in the loaded HTML
+            const scripts = pageDiv.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.textContent = oldScript.textContent;
+                }
+                document.head.appendChild(newScript);
+                oldScript.remove();
+            });
+            
+            // Execute page render function if data is ready
+            const renderFn = window[`render${pageId.charAt(0).toUpperCase() + pageId.slice(1)}Page`];
+            if (typeof renderFn === 'function' && DataManager.data.settings) {
+                renderFn();
             }
             
         } catch (err) {
