@@ -75,21 +75,21 @@
                 <div class="detail-info-item">
                     <i class="fa-solid fa-calendar"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Date</span><span data-tr>Tarih</span></span>
+                        <span class="detail-info-label" id="eventModalLabelDate">Date</span>
                         <span class="detail-info-value" id="eventDetailDate"></span>
                     </div>
                 </div>
                 <div class="detail-info-item">
                     <i class="fa-solid fa-clock"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Time</span><span data-tr>Saat</span></span>
+                        <span class="detail-info-label" id="eventModalLabelTime">Time</span>
                         <span class="detail-info-value" id="eventDetailTime"></span>
                     </div>
                 </div>
                 <div class="detail-info-item">
                     <i class="fa-solid fa-location-dot"></i>
                     <div>
-                        <span class="detail-info-label"><span data-en>Location</span><span data-tr>Konum</span></span>
+                        <span class="detail-info-label" id="eventModalLabelLocation">Location</span>
                         <span class="detail-info-value" id="eventDetailLocation"></span>
                     </div>
                 </div>
@@ -189,6 +189,14 @@ function openEventDetail(index) {
     if (!e) return;
     
     currentEventIndex = index;
+    
+    // Update labels with current language
+    const labelDate = document.getElementById('eventModalLabelDate');
+    const labelTime = document.getElementById('eventModalLabelTime');
+    const labelLocation = document.getElementById('eventModalLabelLocation');
+    if (labelDate) labelDate.textContent = t('Date', 'Tarih');
+    if (labelTime) labelTime.textContent = t('Time', 'Saat');
+    if (labelLocation) labelLocation.textContent = t('Location', 'Konum');
     
     document.getElementById('eventDetailType').textContent = e.type || 'Event';
     document.getElementById('eventDetailType').className = 'tag ' + getTagClass(e.type);

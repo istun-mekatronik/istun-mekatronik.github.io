@@ -108,12 +108,29 @@
     // Register render function with multiple naming conventions
     function renderEventDetailPage() {
         const index = window.currentDetailIndex;
-        if (typeof index === 'number' && index >= 0) {
-            window.renderEventDetail(index);
+        console.log('renderEventDetailPage called, index:', index);
+        
+        if (typeof index !== 'number' || index < 0) {
+            console.warn('No valid event index set');
+            return;
         }
+        
+        const data = getData('events');
+        if (!data || data.length === 0) {
+            console.warn('Events data not loaded yet, retrying...');
+            setTimeout(renderEventDetailPage, 100);
+            return;
+        }
+        
+        window.renderEventDetail(index);
     }
     window.renderEventDetailPage = renderEventDetailPage;
     window['renderEvent-detailPage'] = renderEventDetailPage;
     window.renderEventdetailPage = renderEventDetailPage;
+    
+    // Auto-render on page load if index is set
+    if (typeof window.currentDetailIndex === 'number') {
+        setTimeout(renderEventDetailPage, 50);
+    }
 })();
 </script>

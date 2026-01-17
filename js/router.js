@@ -76,6 +76,22 @@ const Router = {
             html += '</div>';
         }
         
+        // Next Event Card
+        html += `
+            <div class="sidebar-card" id="nextEventCard">
+                <div class="sidebar-card-title">
+                    <i class="fa-solid fa-calendar-day"></i>
+                    <span data-en>Next Event</span><span data-tr>Yaklaşan Etkinlik</span>
+                </div>
+                <p id="nextEventText" style="font-size:0.75rem;color:var(--text-muted);margin:0.5rem 0;">
+                    <span data-en>Loading...</span><span data-tr>Yükleniyor...</span>
+                </p>
+                <button class="btn btn-sm btn-ghost" style="width:100%;" onclick="Router.goTo('news')">
+                    <span data-en>View Events</span><span data-tr>Etkinlikler</span>
+                </button>
+            </div>
+        `;
+        
         // Data panel at bottom
         html += `
             <div class="sidebar-data-panel" id="sidebarDataPanel">
@@ -319,6 +335,24 @@ const Router = {
             const upcomingEvents = data.events.filter(e => new Date(e.date) >= new Date()).length;
             notifBadge.textContent = upcomingEvents;
             notifBadge.setAttribute('data-count', upcomingEvents);
+        }
+        
+        // Next event card in sidebar
+        const nextEventText = document.getElementById('nextEventText');
+        if (nextEventText && data.events.length > 0) {
+            // Find the next upcoming event
+            const now = new Date();
+            const upcoming = data.events
+                .filter(e => new Date(e.date) >= now)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            if (upcoming.length > 0) {
+                const next = upcoming[0];
+                const title = I18n.t(next.title_en, next.title_tr) || next.title || 'Event';
+                nextEventText.innerHTML = `<strong>${next.date}</strong><br>${title}`;
+            } else {
+                nextEventText.innerHTML = I18n.t('No upcoming events', 'Yaklaşan etkinlik yok');
+            }
         }
         
         // Update last updated time

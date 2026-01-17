@@ -213,9 +213,9 @@ function renderHomePage() {
         `;
     }).join('') || `<p>${t('No news.', 'Haber yok.')}</p>`;
     
-    // Upcoming Events (first 4)
-    document.getElementById('homeUpcomingEvents').innerHTML = data.events.slice(0, 4).map(e => `
-        <div class="timeline-item">
+    // Upcoming Events (first 4) - clickable
+    document.getElementById('homeUpcomingEvents').innerHTML = data.events.slice(0, 4).map((e, i) => `
+        <div class="timeline-item card-clickable" onclick="window.openHomeEventDetail(${i})" style="cursor:pointer;">
             <div class="timeline-date">${e.date} · ${e.time}</div>
             <div class="timeline-card">
                 <span class="tag ${getTagClass(e.type)}">${e.type || 'Event'}</span>
@@ -233,4 +233,17 @@ function renderHomePage() {
             : `<span style="color:var(--text-muted);font-weight:600;">${p.name}</span>`
     ).join('') || `<p>${t('No partners.', 'Ortak yok.')}</p>`;
 }
+
+// Navigate to event detail from home page
+window.openHomeEventDetail = function(index) {
+    window.currentDetailIndex = index;
+    Router.goTo('event-detail');
+    setTimeout(() => {
+        if (typeof window.renderEventDetailPage === 'function') {
+            window.renderEventDetailPage();
+        } else if (typeof window.renderEventDetail === 'function') {
+            window.renderEventDetail(index);
+        }
+    }, 100);
+};
 </script>
