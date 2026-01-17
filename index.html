@@ -3327,8 +3327,8 @@
                         return `<strong>${m.title}</strong>: ${oldVal} → ${newVal}`;
                     }).join('<br>');
                     parts.push(isTr 
-                        ? `<span style="color:#f59e0b;">âœï¸ ${changes.modified.length} güncellendi:</span><br>${details}`
-                        : `<span style="color:#f59e0b;">âœï¸ ${changes.modified.length} updated:</span><br>${details}`);
+                        ? `<span style="color:#f59e0b;">✏️ ${changes.modified.length} güncellendi:</span><br>${details}`
+                        : `<span style="color:#f59e0b;">✏️ ${changes.modified.length} updated:</span><br>${details}`);
                     if (changes.modified.length > 3) {
                         parts.push(isTr ? `<em>...ve ${changes.modified.length - 3} daha</em>` : `<em>...and ${changes.modified.length - 3} more</em>`);
                     }
@@ -3338,12 +3338,12 @@
                         return `"${m.title}"${fieldStr}`;
                     }).join(', ');
                     parts.push(isTr 
-                        ? `<span style="color:#f59e0b;">âœï¸ ${changes.modified.length} güncellendi:</span> ${details}`
-                        : `<span style="color:#f59e0b;">âœï¸ ${changes.modified.length} updated:</span> ${details}`);
+                        ? `<span style="color:#f59e0b;">✏️ ${changes.modified.length} güncellendi:</span> ${details}`
+                        : `<span style="color:#f59e0b;">✏️ ${changes.modified.length} updated:</span> ${details}`);
                 } else {
                     parts.push(isTr 
-                        ? `<span style="color:#f59e0b;">âœï¸ ${changes.modified.length} kayıt güncellendi</span>`
-                        : `<span style="color:#f59e0b;">âœï¸ ${changes.modified.length} records updated</span>`);
+                        ? `<span style="color:#f59e0b;">✏️ ${changes.modified.length} kayıt güncellendi</span>`
+                        : `<span style="color:#f59e0b;">✏️ ${changes.modified.length} records updated</span>`);
                 }
             }
             
@@ -3363,8 +3363,8 @@
             if (parts.length === 0) {
                 const total = changes.unchanged + changes.added.length + changes.modified.length;
                 return isTr 
-                    ? `<span style="color:#64748b;">âœ“ ${total} kayıt (değişiklik yok)</span>`
-                    : `<span style="color:#64748b;">âœ“ ${total} records (no changes)</span>`;
+                    ? `<span style="color:#64748b;">✓ ${total} kayıt (değişiklik yok)</span>`
+                    : `<span style="color:#64748b;">✓ ${total} records (no changes)</span>`;
             }
             
             return parts.join('<br>');
@@ -3450,7 +3450,7 @@
             // Build summary
             const summaryParts = [];
             if (totalAdded > 0) summaryParts.push(`+${totalAdded}`);
-            if (totalModified > 0) summaryParts.push(`âœï¸${totalModified}`);
+            if (totalModified > 0) summaryParts.push(`✏️${totalModified}`);
             if (totalRemoved > 0) summaryParts.push(`-${totalRemoved}`);
             
             let html = `
@@ -4148,7 +4148,7 @@
             const html = DATA.projects.map((p, i) => `
             <div class="project-card card-clickable" onclick="goToProjectDetail(${i})" style="cursor:pointer;">
                 <div class="project-img" style="background-image:url('${p.image || 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?w=600&q=80'}');">
-                    <span class="project-year" ${p.award ? 'style="background:var(--amber);"' : ''}>${p.award ? 'ðŸ† ' : ''}${p.year || '2024'}</span>
+                    <span class="project-year" ${p.award ? 'style="background:var(--amber);"' : ''}>${p.award ? '🏆 ' : ''}${p.year || '2024'}</span>
                 </div>
                 <div class="project-body">
                     <span class="tag ${getTagClass(p.category)}">${p.category || 'Capstone'}</span>
