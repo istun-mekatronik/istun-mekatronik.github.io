@@ -2,6 +2,16 @@
 // ║  DATA MODULE - Fetches and caches data from Google Sheets                  ║
 // ╚════════════════════════════════════════════════════════════════════════════╝
 
+// Generate Google Sheets CSV URL
+function getSheetURL(tabName, cacheBust) {
+    const sheetId = CONFIG.sheetId || localStorage.getItem('sheetId');
+    if (!sheetId) {
+        console.error('No Google Sheet ID configured!');
+        return null;
+    }
+    return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}&headers=0&cb=${cacheBust}`;
+}
+
 const DataManager = {
     // Data store
     data: {
