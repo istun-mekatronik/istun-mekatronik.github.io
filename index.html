@@ -2868,6 +2868,60 @@
                 </div>
             </div>
 
+            <!-- RESEARCH DETAIL PAGE -->
+            <div id="research-detail" class="page">
+                <div class="detail-page">
+                    <button onclick="goTo('research')" class="btn btn-ghost btn-sm detail-back">
+                        <i class="fa-solid fa-arrow-left"></i> <span data-en>Back to Research</span><span data-tr>Araştırmaya Dön</span>
+                    </button>
+                    
+                    <div class="detail-card">
+                        <div class="detail-image" id="researchDetailImage"></div>
+                        <div class="detail-body">
+                            <div class="detail-meta">
+                                <span class="tag tag-green" id="researchDetailType">Research</span>
+                            </div>
+                            <h1 class="detail-title" id="researchDetailTitle">Loading...</h1>
+                            <p class="detail-subtitle" id="researchDetailFocus"></p>
+                            
+                            <div class="detail-info-grid">
+                                <div class="detail-info-item">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    <div>
+                                        <span class="detail-info-label"><span data-en>Lead Researcher</span><span data-tr>Araştırma Lideri</span></span>
+                                        <span class="detail-info-value" id="researchDetailLead"></span>
+                                    </div>
+                                </div>
+                                <div class="detail-info-item">
+                                    <i class="fa-solid fa-users"></i>
+                                    <div>
+                                        <span class="detail-info-label"><span data-en>Team Size</span><span data-tr>Ekip Büyüklüğü</span></span>
+                                        <span class="detail-info-value" id="researchDetailMembers"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-content" id="researchDetailContent"></div>
+                            
+                            <div class="detail-equipment-box" id="researchPublicationsBox">
+                                <h4><i class="fa-solid fa-book"></i> <span data-en>Key Publications</span><span data-tr>Önemli Yayınlar</span></h4>
+                                <p id="researchDetailPublications"></p>
+                            </div>
+                            
+                            <div class="detail-equipment-box" id="researchProjectsBox">
+                                <h4><i class="fa-solid fa-flask"></i> <span data-en>Active Projects</span><span data-tr>Aktif Projeler</span></h4>
+                                <p id="researchDetailProjects"></p>
+                            </div>
+                            
+                            <div class="detail-equipment-box" id="researchEquipmentBox">
+                                <h4><i class="fa-solid fa-wrench"></i> <span data-en>Equipment & Tools</span><span data-tr>Ekipman ve Araçlar</span></h4>
+                                <p id="researchDetailEquipment"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- JOB DETAIL PAGE -->
             <div id="job-detail" class="page">
                 <div class="detail-page">
@@ -3465,13 +3519,16 @@
         }
 
         function parseCSV(csvText, returnRaw = false) {
+            // First split into lines, handling multi-line quoted values
             const rows = [];
             let currentRow = [];
             let currentVal = '';
             let inQuotes = false;
 
-            // Normalize line endings to \n
-            const csv = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            // Normalize line endings and fix common encoding issues
+            let csv = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            // Fix double-encoded UTF-8
+            csv = csv.replace(/Â·/g, '·').replace(/Â /g, ' ').replace(/Â/g, '');
 
             for (let i = 0; i < csv.length; i++) {
                 const char = csv[i];
@@ -3480,16 +3537,16 @@
                 if (char === '"') {
                     if (inQuotes && nextChar === '"') {
                         currentVal += '"';
-                        i++; // skip escaped quote
+                        i++;
                     } else {
                         inQuotes = !inQuotes;
                     }
                 } else if (char === ',' && !inQuotes) {
-                    currentRow.push(currentVal.trim());
+                    currentRow.push(currentVal);
                     currentVal = '';
                 } else if (char === '\n' && !inQuotes) {
-                    currentRow.push(currentVal.trim());
-                    if (currentRow.length > 0 && (currentRow.length > 1 || currentRow[0] !== '')) {
+                    currentRow.push(currentVal);
+                    if (currentRow.length > 0) {
                         rows.push(currentRow);
                     }
                     currentRow = [];
@@ -3499,24 +3556,33 @@
                 }
             }
 
-            // Add last row if exists
+            // Add last row
             if (currentVal || currentRow.length) {
-                currentRow.push(currentVal.trim());
+                currentRow.push(currentVal);
                 if (currentRow.length > 0) rows.push(currentRow);
             }
 
             if (returnRaw) return rows;
             if (rows.length < 2) return [];
 
-            const headers = rows[0];
+            // Clean headers - remove quotes, trim, lowercase
+            const headers = rows[0].map(h => {
+                let clean = (h || '').replace(/^["']|["']$/g, '').trim().toLowerCase().replace(/\s+/g, '_');
+                return clean;
+            });
+            
             const data = [];
 
             for (let i = 1; i < rows.length; i++) {
                 const values = rows[i];
                 const row = {};
-                headers.forEach((h, idx) => {
-                    const key = h.toLowerCase().replace(/\s+/g, '_');
-                    row[key] = values[idx];
+                headers.forEach((key, idx) => {
+                    if (key) {
+                        let val = values[idx] || '';
+                        // Remove surrounding quotes from value
+                        val = val.replace(/^["']|["']$/g, '').trim();
+                        row[key] = val;
+                    }
                 });
                 data.push(row);
             }
@@ -3695,7 +3761,7 @@
 
             const eventsHTML = events.map((e, i) => `
             <div class="timeline-item card-clickable" onclick="goToEventDetail(${i})" style="cursor:pointer;">
-                <div class="timeline-date">${e.date} Â· ${e.time}</div>
+                <div class="timeline-date">${e.date} · ${e.time}</div>
                 <div class="timeline-card">
                     <span class="tag ${getTagClass(e.type)}">${e.type || 'Event'}</span>
                     <h4>${t(e.title_en, e.title_tr)}</h4>
@@ -3717,9 +3783,14 @@
             const colors = ['#10b981', '#6366f1', '#ec4899', '#14b8a6', '#f59e0b'];
             const icons = ['fa-robot', 'fa-microchip', 'fa-star', 'fa-hand', 'fa-bolt'];
 
-            // Featured on home (max 3)
-            const featuredHTML = DATA.research.slice(0, 3).map((r, i) => `
-            <div class="card card-clickable" onclick="goTo('research')">
+            // Featured on home (max 3, randomized)
+            const shuffled = [...DATA.research].sort(() => Math.random() - 0.5);
+            const featured = shuffled.slice(0, 3);
+            
+            const featuredHTML = featured.map((r, i) => {
+                const originalIdx = DATA.research.indexOf(r);
+                return `
+            <div class="card card-clickable" onclick="goToResearchDetail(${originalIdx})">
                 <div class="card-img" style="background-image:url('${r.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&q=80'}');">
                     <div class="card-img-overlay"></div>
                     <div class="card-img-badge"><span class="tag tag-green">${r.type || 'Lab'}</span></div>
@@ -3730,12 +3801,13 @@
                 </div>
                 <div class="card-footer"><span>${r.lead}</span><span class="card-footer-link">${t('Learn more', 'Detaylar')} →</span></div>
             </div>
-        `).join('');
+            `;
+            }).join('');
             document.getElementById('featuredResearch').innerHTML = featuredHTML || `<p>${t('No research groups.', 'Araştırma grubu yok.')}</p>`;
 
-            // Full list
+            // Full list with clickable cards
             const fullHTML = DATA.research.map((r, i) => `
-            <div class="research-card">
+            <div class="research-card card-clickable" onclick="goToResearchDetail(${i})" style="cursor:pointer;">
                 <div class="research-header">
                     <div class="research-icon" style="background:linear-gradient(135deg, ${colors[i % colors.length]}, ${colors[(i + 1) % colors.length]});"><i class="fa-solid ${icons[i % icons.length]}"></i></div>
                     <div class="research-info">
@@ -3748,9 +3820,59 @@
                     <span class="research-member"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(r.lead || 'L')}&background=0f172a&color=fff&size=32" alt=""> ${r.lead} (Lead)</span>
                     ${r.members ? `<span class="research-member">+${r.members} members</span>` : ''}
                 </div>
+                <div style="margin-top:0.75rem;text-align:right;">
+                    <span class="card-footer-link" style="color:var(--accent);font-size:0.85rem;">${t('View Details', 'Detaylar')} →</span>
+                </div>
             </div>
         `).join('');
             document.getElementById('researchGroups').innerHTML = fullHTML || `<p>${t('No research groups.', 'Araştırma grubu yok.')}</p>`;
+        }
+
+        function goToResearchDetail(index) {
+            currentDetailPage = 'research';
+            currentDetailIndex = index;
+            const r = DATA.research[index];
+            if (!r) return;
+
+            document.getElementById('researchDetailTitle').textContent = t(r.name_en, r.name_tr);
+            document.getElementById('researchDetailFocus').textContent = r.focus || '';
+            document.getElementById('researchDetailType').textContent = r.type || 'Research';
+            document.getElementById('researchDetailLead').textContent = r.lead || '—';
+            document.getElementById('researchDetailMembers').textContent = r.members ? `${r.members} ${t('members', 'üye')}` : '—';
+            document.getElementById('researchDetailImage').style.backgroundImage = `url('${r.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&q=80'}')`;
+            
+            // Content with proper line breaks
+            const content = t(r.content_en, r.content_tr) || t(r.description_en, r.description_tr);
+            document.getElementById('researchDetailContent').innerHTML = content ? content.replace(/\n/g, '<br>') : '';
+            
+            // Publications
+            const pubBox = document.getElementById('researchPublicationsBox');
+            if (r.publications) {
+                pubBox.style.display = 'block';
+                document.getElementById('researchDetailPublications').textContent = r.publications;
+            } else {
+                pubBox.style.display = 'none';
+            }
+            
+            // Projects
+            const projBox = document.getElementById('researchProjectsBox');
+            if (r.projects) {
+                projBox.style.display = 'block';
+                document.getElementById('researchDetailProjects').textContent = r.projects;
+            } else {
+                projBox.style.display = 'none';
+            }
+            
+            // Equipment
+            const equipBox = document.getElementById('researchEquipmentBox');
+            if (r.equipment) {
+                equipBox.style.display = 'block';
+                document.getElementById('researchDetailEquipment').textContent = r.equipment;
+            } else {
+                equipBox.style.display = 'none';
+            }
+
+            goTo('research-detail');
         }
 
         function renderFaculty() {
@@ -3857,7 +3979,7 @@
                     </div>
                     <div class="course-info">
                         <h4>${c.code}: ${t(c.name_en, c.name_tr)}</h4>
-                        <p>${t(c.description_en, c.description_tr)} Â· ${c.instructor} Â· ${c.year}</p>
+                        <p>${t(c.description_en, c.description_tr)} · ${c.instructor} · ${c.year}</p>
                     </div>
                     <span class="tag">${c.ects || '3'} ECTS</span>
                 </div>
@@ -3911,7 +4033,7 @@
                     <p>${t(l.equipment_en, l.equipment_tr)}</p>
                 </div>
                 <div class="card-footer">
-                    <span>${l.room} Â· ${l.manager}</span>
+                    <span>${l.room} · ${l.manager}</span>
                     <span class="card-footer-link">${t('View Details', 'Detaylar')} →</span>
                 </div>
             </div>
@@ -3926,7 +4048,7 @@
             <div class="card-compact card-clickable" onclick="goToJobDetail(${i})" style="cursor:pointer;">
                 <div class="card-compact-content">
                     <h4>${t(j.title_en, j.title_tr)}</h4>
-                    <p>${j.company} Â· ${j.location} Â· ${j.salary}</p>
+                    <p>${cleanText(j.company)} · ${cleanText(j.location)} · ${cleanText(j.salary)}</p>
                 </div>
                 <span class="tag ${getTagClass(j.type)}">${j.type || 'Job'}</span>
             </div>
@@ -3937,20 +4059,23 @@
         function renderAlumni() {
             const s = DATA.settings;
             document.getElementById('alumniStats').innerHTML = `
-            <div class="stat-card"><span class="stat-value">${s.alumni_total || '312'}</span><div class="stat-label">${t('Total Alumni', 'Toplam Mezun')}</div></div>
+            <div class="stat-card"><span class="stat-value">${s.alumni_total || '320'}</span><div class="stat-label">${t('Total Alumni', 'Toplam Mezun')}</div></div>
             <div class="stat-card"><span class="stat-value">${s.alumni_employed || '94%'}</span><div class="stat-label">${t('Employed', 'İstihdam')}</div></div>
             <div class="stat-card"><span class="stat-value">${s.alumni_startups || '8'}</span><div class="stat-label">${t('Startups', 'Girişim')}</div></div>
         `;
 
-            const html = DATA.alumni.map(a => `
+            const html = DATA.alumni.map(a => {
+                const yearDisplay = a.year ? ` (${a.year})` : '';
+                return `
             <div class="card-compact">
                 <img src="${a.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(a.name || 'A')}&background=6366f1&color=fff&size=80`}" style="width:44px;height:44px;border-radius:50%;" alt="">
                 <div class="card-compact-content">
-                    <h4>${a.name} (${a.year})</h4>
-                    <p>${a.position} @ ${a.company}</p>
+                    <h4>${a.name || ''}${yearDisplay}</h4>
+                    <p>${a.position || ''} @ ${a.company || ''}</p>
                 </div>
             </div>
-        `).join('');
+            `;
+            }).join('');
             document.getElementById('alumniList').innerHTML = html || `<p>${t('No alumni data.', 'Mezun verisi yok.')}</p>`;
         }
 
@@ -4184,7 +4309,14 @@
                 case 'project': goToProjectDetail(currentDetailIndex); break;
                 case 'lab': goToLabDetail(currentDetailIndex); break;
                 case 'job': goToJobDetail(currentDetailIndex); break;
+                case 'research': goToResearchDetail(currentDetailIndex); break;
             }
+        }
+        
+        // Helper to fix double-encoded UTF-8 from Google Sheets
+        function cleanText(str) {
+            if (!str) return '';
+            return str.replace(/Â·/g, '·').replace(/Â /g, ' ').replace(/Â/g, '');
         }
 
         function renderAll() {
