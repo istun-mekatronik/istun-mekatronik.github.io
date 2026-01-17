@@ -5073,27 +5073,33 @@
                     </div>
                     
                     <div id="adminTabSettings" class="admin-tab-content" style="display:none;">
+                        
+                        <!-- Security Info Box -->
+                        <div class="settings-group" style="background:linear-gradient(135deg, #dbeafe, #e0e7ff); padding:1rem; border-radius:8px; border-left:4px solid var(--accent); margin-bottom:1rem;">
+                            <p style="margin:0; font-weight:600; color:#1e40af;"><i class="fa-solid fa-shield-halved"></i> 
+                            <span data-en>How Security Works</span><span data-tr>Güvenlik Nasıl Çalışır</span></p>
+                            <ul style="margin:0.5rem 0 0 0; padding-left:1.2rem; font-size:0.85rem; color:#1e3a8a; line-height:1.6;">
+                                <li><span data-en>The admin password only protects this panel's UI</span><span data-tr>Yönetici şifresi sadece bu panelin arayüzünü korur</span></li>
+                                <li><span data-en><strong>Real security = Google Sheet permissions</strong></span><span data-tr><strong>Gerçek güvenlik = Google Sheet izinleri</strong></span></li>
+                                <li><span data-en>Keep your sheet <strong>private</strong> - don't share edit access publicly</span><span data-tr>Sheet'inizi <strong>gizli</strong> tutun - herkese düzenleme izni vermeyin</span></li>
+                                <li><span data-en>The embedded editor requires Google login with edit permission</span><span data-tr>Gömülü düzenleyici, düzenleme yetkisi olan Google girişi gerektirir</span></li>
+                            </ul>
+                        </div>
+                        
                         <div class="settings-group">
                             <label><span data-en>Google Sheet ID</span><span data-tr>Google Sheet ID</span></label>
                             <input type="text" id="settingSheetId" class="admin-input" style="width:100%;">
                             <p class="admin-hint"><span data-en>Found in the sheet URL after /d/</span><span data-tr>Sheet URL'sinde /d/ sonrasında bulunur</span></p>
                         </div>
                         
-                        <!-- Warning when sheet password is set -->
-                        <div id="sheetPasswordWarning" class="settings-group" style="display:none; background:#fef3c7; padding:1rem; border-radius:8px; border-left:4px solid var(--amber);">
-                            <p style="margin:0; color:#92400e;"><i class="fa-solid fa-shield-halved" style="color:#d97706;"></i> 
-                            <strong><span data-en>Password Protected via Google Sheet</span><span data-tr>Google Sheet ile Şifre Korumalı</span></strong></p>
+                        <div class="settings-group" style="background:#fef3c7; padding:1rem; border-radius:8px; border-left:4px solid #f59e0b;">
+                            <p style="margin:0; font-weight:600; color:#92400e;"><i class="fa-solid fa-lock"></i> 
+                            <span data-en>Admin Password</span><span data-tr>Yönetici Şifresi</span></p>
                             <p style="margin:0.5rem 0 0 0; font-size:0.85rem; color:#78350f;">
-                            <span data-en>Admin password is set in your Google Sheet's Settings tab. Only the sheet owner can change it. This is the most secure option.</span>
-                            <span data-tr>Yönetici şifresi Google Sheet'inizin Settings sekmesinde ayarlanmış. Sadece sheet sahibi değiştirebilir. Bu en güvenli seçenektir.</span></p>
+                            <span data-en>To change the password, edit your Google Sheet's <strong>Settings</strong> tab → row with key <code style="background:#fef9c3;padding:2px 6px;border-radius:4px;">admin_password</code>. Only users with sheet edit access can change it.</span>
+                            <span data-tr>Şifreyi değiştirmek için Google Sheet'inizin <strong>Settings</strong> sekmesinde <code style="background:#fef9c3;padding:2px 6px;border-radius:4px;">admin_password</code> satırını düzenleyin. Sadece sheet düzenleme yetkisi olanlar değiştirebilir.</span></p>
                         </div>
                         
-                        <div class="settings-group" id="localPasswordSection">
-                            <label><span data-en>Change Admin Password</span><span data-tr>Yönetici Şifresini Değiştir</span></label>
-                            <input type="password" id="settingCurrentPassword" class="admin-input" style="width:100%; margin-bottom:0.5rem;" placeholder="Current password / Mevcut şifre">
-                            <input type="password" id="settingNewPassword" class="admin-input" style="width:100%;" placeholder="New password / Yeni şifre">
-                            <p class="admin-hint"><i class="fa-solid fa-shield-halved" style="color:var(--accent);"></i> <span data-en><strong>Recommended:</strong> Set password in your Google Sheet's Settings tab with key "admin_password" for better security. Sheet passwords cannot be changed from this panel.</span><span data-tr><strong>Önerilen:</strong> Daha iyi güvenlik için Google Sheet'inizin Settings sekmesine "admin_password" anahtarıyla şifre ekleyin. Sheet şifreleri bu panelden değiştirilemez.</span></p>
-                        </div>
                         <button class="btn btn-accent" onclick="saveAdminSettings()">
                             <i class="fa-solid fa-save"></i> <span data-en>Save Settings</span><span data-tr>Ayarları Kaydet</span>
                         </button>
@@ -5371,28 +5377,9 @@
                 const sheetUrl = `https://docs.google.com/spreadsheets/d/${ADMIN_CONFIG.sheetId}/edit?usp=sharing&rm=embedded`;
                 document.getElementById('sheetEmbed').src = sheetUrl;
                 document.getElementById('openSheetLink').href = `https://docs.google.com/spreadsheets/d/${ADMIN_CONFIG.sheetId}/edit`;
-                
-                // Update password section visibility based on whether sheet password is set
-                updatePasswordSectionVisibility();
             } else {
                 document.getElementById('loginError').style.display = 'block';
                 document.getElementById('adminPassword').value = '';
-            }
-        }
-        
-        function updatePasswordSectionVisibility() {
-            const hasSheetPassword = !!ADMIN_CONFIG.sheetPasswordHash;
-            const warningEl = document.getElementById('sheetPasswordWarning');
-            const localPwdSection = document.getElementById('localPasswordSection');
-            
-            if (hasSheetPassword) {
-                // Sheet password is set - show warning, hide local password change
-                warningEl.style.display = 'block';
-                localPwdSection.style.display = 'none';
-            } else {
-                // No sheet password - show local password change option
-                warningEl.style.display = 'none';
-                localPwdSection.style.display = 'block';
             }
         }
         
@@ -5407,41 +5394,17 @@
         
         async function saveAdminSettings() {
             const newSheetId = document.getElementById('settingSheetId').value.trim();
-            const currentPwd = document.getElementById('settingCurrentPassword').value.trim();
-            const newPwd = document.getElementById('settingNewPassword').value.trim();
             
-            // Update sheet ID
+            // Update sheet ID only
             if (newSheetId && newSheetId !== ADMIN_CONFIG.sheetId) {
                 localStorage.setItem('sheetId', newSheetId);
                 ADMIN_CONFIG.sheetId = newSheetId;
                 GOOGLE_SHEET_ID = newSheetId;
+                alert(lang === 'tr' ? 'Ayarlar kaydedildi! Sayfa yenilenecek.' : 'Settings saved! Page will reload.');
+                location.reload();
+            } else {
+                alert(lang === 'tr' ? 'Değişiklik yok.' : 'No changes to save.');
             }
-            
-            // Update password (requires current password verification)
-            // Block if sheet password is set (can only be changed in Google Sheet)
-            if (newPwd) {
-                if (ADMIN_CONFIG.sheetPasswordHash) {
-                    alert(lang === 'tr' 
-                        ? 'Şifre Google Sheet\'te ayarlanmış. Sadece sheet üzerinden değiştirilebilir.' 
-                        : 'Password is set in Google Sheet. It can only be changed there.');
-                    return;
-                }
-                if (!currentPwd) {
-                    alert(lang === 'tr' ? 'Mevcut şifreyi girin' : 'Enter current password');
-                    return;
-                }
-                const isCurrentValid = await verifyPassword(currentPwd);
-                if (!isCurrentValid) {
-                    alert(lang === 'tr' ? 'Mevcut şifre yanlış' : 'Current password is incorrect');
-                    return;
-                }
-                const newHash = await secureHash(newPwd);
-                localStorage.setItem('adminPasswordHash', newHash);
-                ADMIN_CONFIG.passwordHash = newHash;
-            }
-            
-            alert(lang === 'tr' ? 'Ayarlar kaydedildi! Sayfa yenilenecek.' : 'Settings saved! Page will reload.');
-            location.reload();
         }
     </script>
 
