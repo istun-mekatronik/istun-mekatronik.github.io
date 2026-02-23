@@ -366,13 +366,37 @@ function render() {
 
   // ─── LEFT SIDE: Name, Dept, Title ───
   let y = pad;
+  const maxLeftW = divX - pad - 40; // max text width on left side
 
-  // Name
+  // Name — auto-fit: try shrinking font, then wrap to 2 lines
+  const displayName = namePrefix + ' ' + fullName;
   ctx.fillStyle = '#2D3436';
-  ctx.font = '700 52px "DM Sans", sans-serif';
   ctx.textBaseline = 'top';
-  ctx.fillText(namePrefix + ' ' + fullName, pad, y);
-  y += 68;
+
+  let nameFontSize = 52;
+  ctx.font = '700 ' + nameFontSize + 'px "DM Sans", sans-serif';
+  let nameW = ctx.measureText(displayName).width;
+
+  if (nameW > maxLeftW) {
+    // Try shrinking down to 34px
+    while (nameFontSize > 34 && ctx.measureText(displayName).width > maxLeftW) {
+      nameFontSize -= 2;
+      ctx.font = '700 ' + nameFontSize + 'px "DM Sans", sans-serif';
+    }
+    nameW = ctx.measureText(displayName).width;
+  }
+
+  if (nameW > maxLeftW) {
+    // Still too long — wrap into 2 lines: prefix on line 1, name on line 2
+    ctx.font = '700 ' + nameFontSize + 'px "DM Sans", sans-serif';
+    ctx.fillText(namePrefix, pad, y);
+    y += nameFontSize + 6;
+    ctx.fillText(fullName, pad, y);
+    y += nameFontSize + 12;
+  } else {
+    ctx.fillText(displayName, pad, y);
+    y += nameFontSize + 16;
+  }
 
   // Department
   ctx.fillStyle = '#555555';
