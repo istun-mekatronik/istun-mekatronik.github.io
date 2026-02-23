@@ -236,6 +236,10 @@
         <label id="lblPhone">Dahili / Mobil <span style="font-weight:400;color:#aaa">(opsiyonel)</span></label>
         <input type="text" id="inpPhone" placeholder="" oninput="render()">
       </div>
+      <div class="form-group">
+        <label id="lblPersonalWeb">Kişisel Web Sitesi <span style="font-weight:400;color:#aaa">(opsiyonel)</span></label>
+        <input type="text" id="inpPersonalWeb" placeholder="akademik.istun.edu.tr/isim" oninput="render()">
+      </div>
     </div>
   </div>
 
@@ -320,6 +324,7 @@ function setLang(l) {
     document.getElementById('lblName').textContent = 'Ad Soyad';
     document.getElementById('lblEmail').textContent = 'E-posta';
     document.getElementById('lblPhone').innerHTML = 'Dahili / Mobil <span style="font-weight:400;color:#aaa">(opsiyonel)</span>';
+    document.getElementById('lblPersonalWeb').innerHTML = 'Kişisel Web Sitesi <span style="font-weight:400;color:#aaa">(opsiyonel)</span>';
     document.getElementById('lblPreview').textContent = 'Önizleme';
     document.getElementById('lblDownload').textContent = 'PNG İndir';
   } else {
@@ -327,6 +332,7 @@ function setLang(l) {
     document.getElementById('lblName').textContent = 'Full Name';
     document.getElementById('lblEmail').textContent = 'Email';
     document.getElementById('lblPhone').innerHTML = 'Extension / Mobile <span style="font-weight:400;color:#aaa">(optional)</span>';
+    document.getElementById('lblPersonalWeb').innerHTML = 'Personal Website <span style="font-weight:400;color:#aaa">(optional)</span>';
     document.getElementById('lblPreview').textContent = 'Preview';
     document.getElementById('lblDownload').textContent = 'Download PNG';
   }
@@ -354,6 +360,7 @@ function render() {
   const fullName = document.getElementById('inpName').value.trim() || (lang === 'tr' ? 'Ad Soyad' : 'Full Name');
   const email = document.getElementById('inpEmail').value.trim() || 'isim.soyisim@istun.edu.tr';
   const phone = document.getElementById('inpPhone').value.trim();
+  const personalWeb = document.getElementById('inpPersonalWeb').value.trim();
 
   const namePrefix = lang === 'tr' ? titleKey : (PREFIXES_EN[titleKey] || titleKey);
   const dept = lang === 'tr' ? 'Mekatronik Mühendisliği' : 'Mechatronics Engineering';
@@ -434,6 +441,7 @@ function render() {
   items.push({ type: 'phone', lines: [instPhone] });
   if (phone) items.push({ type: 'mobile', lines: [phone] });
   items.push({ type: 'email', lines: [email] });
+  if (personalWeb) items.push({ type: 'web', lines: [personalWeb] });
   items.push({ type: 'web', lines: [website] });
 
   const usableH = H - 2 * pad;
