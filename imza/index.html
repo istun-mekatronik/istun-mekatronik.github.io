@@ -402,11 +402,6 @@ function render() {
   ctx.fillStyle = '#555555';
   ctx.font = '600 30px "DM Sans", sans-serif';
   ctx.fillText(dept, pad, y);
-  y += 44;
-
-  // Academic title
-  ctx.font = '600 30px "DM Sans", sans-serif';
-  ctx.fillText(acadTitle, pad, y);
   y += 52;
 
   // Logo
@@ -417,7 +412,7 @@ function render() {
     const ratio = Math.min(maxLogoW / logo.naturalWidth, maxLogoH / logo.naturalHeight, 1);
     const lw = logo.naturalWidth * ratio;
     const lh = logo.naturalHeight * ratio;
-    ctx.drawImage(logo, pad, y + 5, lw, lh);
+    ctx.drawImage(logo, pad, y + 30, lw, lh);
   }
 
   // ─── VERTICAL DIVIDER ───
