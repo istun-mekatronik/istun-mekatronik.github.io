@@ -364,6 +364,7 @@ function render() {
 
   const namePrefix = lang === 'tr' ? titleKey : (PREFIXES_EN[titleKey] || titleKey);
   const dept = lang === 'tr' ? 'Mekatronik Mühendisliği' : 'Mechatronics Engineering';
+  const faculty = lang === 'tr' ? 'Mühendislik ve Doğa Bilimleri Fakültesi' : 'Faculty of Engineering and Natural Sciences';
   const acadTitle = lang === 'tr' ? (TITLES_TR[titleKey] || titleKey) : (TITLES_EN[titleKey] || titleKey);
 
   const address1 = lang === 'tr' ? 'Sütlüce Mah. İmrahor Cad. No: 82' : 'Sütlüce Mah. İmrahor Cad. No: 82';
@@ -409,7 +410,12 @@ function render() {
   ctx.fillStyle = '#555555';
   ctx.font = '600 30px "DM Sans", sans-serif';
   ctx.fillText(dept, pad, y);
-  y += 52;
+  y += 40;
+
+  // Faculty
+  ctx.font = '400 26px "DM Sans", sans-serif';
+  ctx.fillText(faculty, pad, y);
+  y += 44;
 
   // Logo
   const logo = lang === 'tr' ? logoTR : logoEN;
